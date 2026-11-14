@@ -1,0 +1,13 @@
+node_modules
+.next
+.env*
+# Anciennes pages (avant le passage au groupe de routes "(site)") : ignorées si un ancien dossier a été écrasé par une mise à jour.
+app/cart
+app/checkout
+app/order
+app/outiko
+app/products
+app/register-shop
+app/store
+app/track
+app/page.tsx

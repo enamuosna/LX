@@ -1,0 +1,66 @@
+# Lx — déploiement Coolify (type de ressource : « Docker Compose », build pack Docker Compose)
+# Emplacement du fichier dans Coolify : /docker-compose.coolify.yml
+# Les variables SERVICE_* sont générées par Coolify ; ADMIN_PASSWORD est à renseigner dans l'onglet « Environment Variables ».
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: lx
+      POSTGRES_PASSWORD: ${SERVICE_PASSWORD_DB}
+      POSTGRES_DB: lx_medusa
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lx -d lx_medusa"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Domaine public de l'API + admin (Coolify : onglet Domains du service « backend », port 9000)
+      SERVICE_FQDN_BACKEND_9000: ""
+      DATABASE_URL: postgres://lx:${SERVICE_PASSWORD_DB}@db:5432/lx_medusa?sslmode=disable
+      BACKEND_PUBLIC_URL: ${SERVICE_URL_BACKEND}
+      STORE_CORS: ${SERVICE_URL_STOREFRONT}
+      ADMIN_CORS: ${SERVICE_URL_BACKEND}
+      AUTH_CORS: ${SERVICE_URL_BACKEND},${SERVICE_URL_STOREFRONT}
+      JWT_SECRET: ${SERVICE_PASSWORD_64_JWT}
+      COOKIE_SECRET: ${SERVICE_PASSWORD_64_COOKIE}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@lx.sn}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Définissez ADMIN_PASSWORD dans les variables d'environnement Coolify}
+      LX_STOREFRONT_URL: ${SERVICE_URL_STOREFRONT}
+      LX_DELIVERY_FEE: ${LX_DELIVERY_FEE:-1500}
+      LX_WA_TOKEN: ${LX_WA_TOKEN:-}
+      LX_WA_PHONE_ID: ${LX_WA_PHONE_ID:-}
+      LX_WA_NUMBER: ${LX_WA_NUMBER:-221770000000}
+    volumes:
+      - uploads:/app/static
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:9000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 240s
+
+  storefront:
+    build: ./storefront
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      # Domaine public de la vitrine (Coolify : onglet Domains du service « storefront », port 3000)
+      SERVICE_FQDN_STOREFRONT_3000: ""
+      MEDUSA_INTERNAL_URL: http://backend:9000
+      NEXT_PUBLIC_LX_PHONE: ${LX_PHONE:-+221 77 000 00 00}
+      NEXT_PUBLIC_LX_EMAIL: ${LX_EMAIL:-contact@lx.sn}
+
+volumes:
+  pgdata:
+  uploads:

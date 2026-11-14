@@ -1,0 +1,52 @@
+# Lx — lancement complet : docker compose up --build
+# Vitrine : http://localhost:3000 · Admin : http://localhost:9000/app · API : http://localhost:9000
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: lx
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-lxpass}
+      POSTGRES_DB: lx_medusa
+    volumes: [ "pgdata:/var/lib/postgresql/data" ]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lx -d lx_medusa"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      DATABASE_URL: postgres://lx:${DB_PASSWORD:-lxpass}@db:5432/lx_medusa?sslmode=disable
+      STORE_CORS: http://localhost:3000
+      ADMIN_CORS: http://localhost:9000
+      AUTH_CORS: http://localhost:9000,http://localhost:3000
+      JWT_SECRET: ${JWT_SECRET:-change-me-jwt}
+      COOKIE_SECRET: ${COOKIE_SECRET:-change-me-cookie}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@lx.sn}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-ChangeMe!2026}
+      LX_STOREFRONT_URL: http://localhost:3000
+      LX_WA_TOKEN: ${LX_WA_TOKEN:-}
+      LX_WA_PHONE_ID: ${LX_WA_PHONE_ID:-}
+      LX_WA_NUMBER: ${LX_WA_NUMBER:-221770000000}
+      LX_DELIVERY_FEE: ${LX_DELIVERY_FEE:-1500}
+    ports: [ "9000:9000" ]
+    volumes: [ "uploads:/app/static" ]
+
+  storefront:
+    build: ./storefront
+    restart: unless-stopped
+    depends_on: [ backend ]
+    environment:
+      MEDUSA_INTERNAL_URL: http://backend:9000
+      NEXT_PUBLIC_LX_PHONE: ${LX_PHONE:-+221 77 000 00 00}
+      NEXT_PUBLIC_LX_EMAIL: ${LX_EMAIL:-contact@lx.sn}
+    ports: [ "3000:3000" ]
+
+volumes:
+  pgdata:
+  uploads:

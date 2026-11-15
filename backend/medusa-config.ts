@@ -7,6 +7,8 @@ module.exports = defineConfig({
     databaseUrl: process.env.DATABASE_URL,
     // PostgreSQL du docker-compose sans SSL ; mettre DATABASE_SSL=true pour une base managée distante.
     databaseDriverOptions: { connection: { ssl: process.env.DATABASE_SSL === "true" ? { rejectUnauthorized: false } : false } },
+    // Admin en http local : le cookie de session ne doit pas être « secure » (COOKIE_SECURE=false).
+    ...(process.env.COOKIE_SECURE === "false" ? { cookieOptions: { secure: false, sameSite: "lax" as const } } : {}),
     http: {
       storeCors: process.env.STORE_CORS!,
       adminCors: process.env.ADMIN_CORS!,

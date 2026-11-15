@@ -21,9 +21,9 @@ services:
     depends_on:
       db: { condition: service_healthy }
     environment:
-      # En local (http://localhost) le cookie de session de l'admin ne peut pas être « Secure » : mode développement.
-      # Sur un serveur en HTTPS (Coolify…), utiliser docker-compose.coolify.yml (production).
-      NODE_ENV: ${LX_NODE_ENV:-development}
+      NODE_ENV: production
+      # http en local : cookie de session non sécurisé (mettre true derrière https, ex. tunnel Cloudflare)
+      COOKIE_SECURE: ${LX_COOKIE_SECURE:-false}
       DATABASE_URL: postgres://lx:${DB_PASSWORD:-lxpass}@db:5432/lx_medusa?sslmode=disable
       STORE_CORS: http://localhost:3000
       ADMIN_CORS: http://localhost:9000

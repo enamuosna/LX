@@ -77,3 +77,6 @@ Admin Medusa > menu **Lx** : commandes par boutique (statuts, livreur, encaissem
 - Pas d'application mobile, de SMS ni de saisie de commande par le centre d'appels (à ajouter via l'API admin).
 - Le jeton vendeur est stocké dans le navigateur (localStorage) ; à durcir (cookie httpOnly) avant mise en production.
 - Les images de démo sont servies par le storefront (`/img`) ; les produits créés par les boutiques sont envoyés au stockage de fichiers Medusa.
+
+## Admin en local
+Le conteneur tourne en production. En http://localhost le cookie de session est non sécurisé (`LX_COOKIE_SECURE=false`, défaut). Derrière un domaine https ou un tunnel Cloudflare, mettre `LX_COOKIE_SECURE=true`.

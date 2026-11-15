@@ -1,7 +1,7 @@
 # Lx — « Lo Soxla ? » — Architecture headless (API-first)
 
 - **backend/** : Medusa.js v2 (Node 20+, PostgreSQL) + module métier `lx`
-- **storefront/** : Next.js 15 (App Router, React 19), design Lx (template Electro)
+- **storefront/** : Next.js 15 (App Router, React 19, TypeScript) — bibliothèque de composants React (`components/ui` : Button, Card, Modal, Field, Toast…) + Tailwind CSS v4, icônes lucide-react
 
 ## Lancement avec Docker (recommandé)
 Prérequis : Docker Desktop démarré.
@@ -19,6 +19,7 @@ Le premier démarrage (3 à 6 min) construit les images, crée la base, applique
 
 - Aucune clé à copier : la vitrine récupère seule sa clé publique et appelle l'API via son propre proxy (`/medusa/*`, pas de CORS).
 - Données persistantes : volumes `pgdata` (base) et `uploads` (photos produits). `docker compose down` les conserve ; `docker compose down -v` efface tout.
+- Connexion admin : en local le backend tourne en mode développement (cookie de session non « Secure »), sinon l'admin renvoie des erreurs 401 en HTTP. Pour un serveur HTTPS, utilisez `docker-compose.coolify.yml`.
 - Logs : `docker compose logs -f backend` · Arrêt : `docker compose down`.
 - Sur un serveur (pas en local) : mettre l'URL publique dans `STORE_CORS`, `ADMIN_CORS`, `AUTH_CORS`, `LX_STOREFRONT_URL` du `docker-compose.yml`, changer tous les mots de passe/secrets, ajouter HTTPS (reverse proxy) et Redis.
 

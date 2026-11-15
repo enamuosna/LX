@@ -2,13 +2,13 @@
 import Link from "next/link"
 import { useState } from "react"
 import { useCart } from "@/lib/cart"
-import { fcfa, price, stock, type Product } from "@/lib/medusa"
+import { img, fcfa, price, stock, type Product } from "@/lib/medusa"
 
 export default function ProductCard({ p }: { p: Product }) {
   const { add, busy } = useCart(); const [done, setDone] = useState(false)
   const s = stock(p), old = p.metadata?.old_price, v = p.variants?.[0]
   return (<div className="col-md-3 col-xs-6"><div className="product">
-    <div className="product-img"><img src={p.thumbnail || "/img/product01.png"} alt="" />{s > 0 && <div className="product-label"><span className="sale">Dispo</span></div>}</div>
+    <div className="product-img"><img src={img(p.thumbnail)} alt="" />{s > 0 && <div className="product-label"><span className="sale">Dispo</span></div>}</div>
     <div className="product-body"><p className="product-category">{p.categories?.[0]?.name}</p>
       <h3 className="product-name"><Link href={`/products/${p.handle}`}>{p.title}</Link></h3>
       <h4 className="product-price">{fcfa(price(p))} {old ? <del className="product-old-price">{fcfa(old)}</del> : null}</h4>

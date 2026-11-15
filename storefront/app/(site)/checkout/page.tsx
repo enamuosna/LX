@@ -1,15 +1,24 @@
 "use client"
-import Link from "next/link"
+import { ShoppingBag } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import Banner from "@/components/ui/Banner"
+import Button from "@/components/ui/Button"
+import Container from "@/components/ui/Container"
+import EmptyState from "@/components/ui/EmptyState"
+import { Field, Input, Textarea } from "@/components/ui/Field"
+import PageHeader from "@/components/ui/PageHeader"
 import { useCart } from "@/lib/cart"
+import { cn } from "@/lib/cn"
 import { fcfa, post, store } from "@/lib/medusa"
+
+const PAY: [string, string][] = [["cod", "Paiement à la livraison"], ["mobile_money", "Mobile money (Wave, Orange Money)"], ["card", "Carte bancaire"]]
 
 export default function Checkout() {
   const { cart, reset } = useCart(); const router = useRouter()
-  const [err, setErr] = useState(""), [busy, setBusy] = useState(false)
+  const [err, setErr] = useState(""), [busy, setBusy] = useState(false), [pay, setPay] = useState("cod")
   const items = cart?.items ?? []
-  if (!items.length) return <div className="section"><div className="container"><p>Votre commande est vide. <Link href="/store">Parcourir les produits</Link></p></div></div>
+  if (!items.length) return <Container className="py-16"><EmptyState icon={ShoppingBag} action={<Button href="/store">Parcourir les produits</Button>}>Votre commande est vide.</EmptyState></Container>
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault(); setErr(""); const f = new FormData(e.currentTarget); const g = (k: string) => String(f.get(k) || "").trim()
@@ -18,7 +27,7 @@ export default function Checkout() {
     setBusy(true)
     try {
       const [first, ...rest] = g("name").split(" ")
-      await post(`/store/carts/${cart!.id}`, { email: g("email") || `${phone}@client.lx.sn`, shipping_address: { first_name: first, last_name: rest.join(" ") || "-", address_1: g("address"), city: g("city") || "Dakar", country_code: "sn", phone }, metadata: { note: g("note"), payment_pref: g("payment") } })
+      await post(`/store/carts/${cart!.id}`, { email: g("email") || `${phone}@client.lx.sn`, shipping_address: { first_name: first, last_name: rest.join(" ") || "-", address_1: g("address"), city: g("city") || "Dakar", country_code: "sn", phone }, metadata: { note: g("note"), payment_pref: pay } })
       const { shipping_options } = await store(`/store/shipping-options?cart_id=${cart!.id}`)
       if (!shipping_options.length) throw new Error("Aucune option de livraison disponible.")
       await post(`/store/carts/${cart!.id}/shipping-methods`, { option_id: shipping_options[0].id })
@@ -29,23 +38,29 @@ export default function Checkout() {
       reset(); router.push(`/order/${r.order.display_id}?phone=${phone}`)
     } catch (e: any) { setErr(e.message); setBusy(false) }
   }
-  return (<><div className="lx-page-title"><div className="container"><h2 style={{ margin: 0 }}>Valider ma commande</h2></div></div>
-    <div className="section"><div className="container">{err && <div className="alert alert-danger">{err}</div>}<div className="row">
-      <div className="col-md-7"><div className="section-title"><h3 className="title">Coordonnées de livraison</h3></div>
-        <form onSubmit={submit}>
-          <div className="form-group"><input className="input" name="name" placeholder="Nom complet" required /></div>
-          <div className="form-group"><input className="input" name="phone" placeholder="Téléphone / WhatsApp (ex : 77 000 00 00)" required /></div>
-          <div className="form-group"><input className="input" type="email" name="email" placeholder="Email (optionnel)" /></div>
-          <div className="form-group"><input className="input" name="address" placeholder="Adresse (quartier, repère)" required /></div>
-          <div className="form-group"><input className="input" name="city" defaultValue="Dakar" placeholder="Ville" /></div>
-          <div className="form-group"><textarea className="input" name="note" rows={3} placeholder="Précisions pour le livreur" /></div>
-          <div className="section-title"><h3 className="title">Paiement</h3></div>
-          {[["cod", "Paiement à la livraison"], ["mobile_money", "Mobile money (Wave, Orange Money)"], ["card", "Carte bancaire"]].map(([v, l], i) => <div key={v} className="input-radio"><label><input type="radio" name="payment" value={v} defaultChecked={i === 0} /> {l}</label></div>)}
-          <p style={{ fontSize: 12 }}>Mobile money / carte : enregistrés, l&apos;encaissement est confirmé par l&apos;équipe Lx.</p>
-          <button className="primary-btn" disabled={busy} style={{ marginTop: 15, borderRadius: 40, width: "100%" }}>{busy ? "Validation…" : "Confirmer la commande"}</button></form></div>
-      <div className="col-md-5"><div className="section-title"><h3 className="title">Récapitulatif</h3></div><table className="tbl"><tbody>
-        {items.map((i) => <tr key={i.id}><td>{i.quantity} × {i.title}</td><td style={{ textAlign: "right" }}>{fcfa(i.unit_price * i.quantity)}</td></tr>)}
-        <tr><th>Sous-total produits</th><th style={{ textAlign: "right" }}>{fcfa(cart!.subtotal)}</th></tr></tbody></table>
-        <div className="lx-notice">Frais de livraison Lx ajoutés à la validation. Sans réponse de la boutique sous 30 minutes, Lx prend le relais.</div></div>
-    </div></div></div></>)
+  return (<><PageHeader title="Valider ma commande" />
+    <Container className="py-8">{err && <Banner tone="danger" className="mb-6">{err}</Banner>}
+      <div className="grid gap-8 lg:grid-cols-5">
+        <form onSubmit={submit} className="space-y-4 lg:col-span-3">
+          <h2 className="text-lg font-bold">Coordonnées de livraison</h2>
+          <Field label="Nom complet">{(id) => <Input id={id} name="name" required />}</Field>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Téléphone / WhatsApp">{(id) => <Input id={id} name="phone" placeholder="77 000 00 00" required />}</Field>
+            <Field label="Email (optionnel)">{(id) => <Input id={id} type="email" name="email" />}</Field></div>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <Field label="Adresse (quartier, repère)" className="sm:col-span-2">{(id) => <Input id={id} name="address" required />}</Field>
+            <Field label="Ville">{(id) => <Input id={id} name="city" defaultValue="Dakar" />}</Field></div>
+          <Field label="Précisions pour le livreur">{(id) => <Textarea id={id} name="note" rows={3} />}</Field>
+          <h2 className="pt-2 text-lg font-bold">Paiement</h2>
+          <div className="grid gap-2" role="radiogroup">{PAY.map(([v, l]) => (
+            <label key={v} className={cn("flex items-center gap-3 rounded-xl border px-4 py-3 text-sm font-semibold transition", pay === v ? "border-brand-600 bg-brand-50" : "border-line hover:border-slate-300")}>
+              <input type="radio" name="payment" value={v} checked={pay === v} onChange={() => setPay(v)} className="accent-brand-600" />{l}</label>))}</div>
+          <p className="text-xs text-slate-500">Mobile money / carte : enregistrés, l&apos;encaissement est confirmé par l&apos;équipe Lx.</p>
+          <Button size="lg" full loading={busy} data-testid="confirm-order">{busy ? "Validation…" : "Confirmer la commande"}</Button></form>
+        <aside className="h-fit space-y-4 rounded-2xl border border-line bg-surface p-6 lg:col-span-2">
+          <h2 className="text-lg font-bold">Récapitulatif</h2>
+          <ul className="divide-y divide-line text-sm">{items.map((i) => <li key={i.id} className="flex justify-between gap-3 py-2"><span>{i.quantity} × {i.title}</span><span className="font-semibold">{fcfa(i.unit_price * i.quantity)}</span></li>)}</ul>
+          <div className="flex justify-between border-t border-line pt-3 font-bold"><span>Sous-total produits</span><span>{fcfa(cart!.subtotal)}</span></div>
+          <Banner tone="info">Frais de livraison Lx ajoutés à la validation. Sans réponse de la boutique sous 30 minutes, Lx prend le relais.</Banner></aside>
+      </div></Container></>)
 }

@@ -1,0 +1,33 @@
+@import "tailwindcss";
+@import "@fontsource-variable/montserrat";
+
+/* Identité Lx : vert profond + jaune soleil, encre sombre */
+@theme {
+  --font-sans: "Montserrat Variable", ui-sans-serif, system-ui, sans-serif;
+  --color-brand-50: #e9f6ef;
+  --color-brand-100: #cfeedd;
+  --color-brand-200: #9fdcbb;
+  --color-brand-500: #12a05c;
+  --color-brand-600: #0b7a43;
+  --color-brand-700: #08592f;
+  --color-brand-800: #064424;
+  --color-accent-400: #f7bd2e;
+  --color-accent-500: #f2a900;
+  --color-ink: #1e1f29;
+  --color-night: #15161d;
+  --color-surface: #f4f6f9;
+  --color-line: #e6e8ee;
+  --animate-fade-in: fade-in 0.15s ease-out;
+  --animate-slide-in: slide-in 0.25s ease-out;
+  --animate-shimmer: shimmer 1.2s infinite;
+  @keyframes fade-in { from { opacity: 0 } }
+  @keyframes slide-in { from { opacity: 0; transform: translateX(24px) } }
+  @keyframes shimmer { to { background-position: -200% 0 } }
+}
+
+@layer base {
+  html { scroll-behavior: smooth; }
+  body { @apply overflow-x-hidden bg-white font-sans text-ink antialiased; }
+  button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer; }
+  :focus-visible { @apply outline-2 outline-offset-2 outline-brand-600; }
+}

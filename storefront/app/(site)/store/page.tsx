@@ -1,17 +1,23 @@
+import { PackageSearch } from "lucide-react"
 import Link from "next/link"
-import Grid from "@/components/Grid"
+import ProductGrid from "@/components/product/ProductGrid"
+import Banner from "@/components/ui/Banner"
+import Container from "@/components/ui/Container"
+import EmptyState from "@/components/ui/EmptyState"
+import PageHeader from "@/components/ui/PageHeader"
+import { cn } from "@/lib/cn"
 import { listCategories, listProducts } from "@/lib/medusa"
 export const dynamic = "force-dynamic"
 
 export default async function Store({ searchParams }: { searchParams: Promise<{ q?: string; cat?: string }> }) {
   const { q, cat } = await searchParams
   const [products, cats] = await Promise.all([listProducts({ q, category_id: cat }).catch(() => []), listCategories().catch(() => [])])
+  const chip = (on: boolean) => cn("rounded-full border px-4 py-1.5 text-sm font-semibold transition", on ? "border-brand-600 bg-brand-600 text-white" : "border-line bg-white hover:border-brand-600 hover:text-brand-600")
   return (<>
-    <div className="lx-page-title"><div className="container"><h2 style={{ margin: 0 }}>{q ? `Résultats pour « ${q} »` : "Tous les produits"}</h2>
-      <p style={{ margin: "5px 0 0" }}>{products.length} produit(s) chez nos boutiques agréées</p>
-      <p style={{ margin: "8px 0 0" }}><Link href="/store">Tout</Link>{cats.map((c) => <span key={c.id}> · <Link href={`/store?cat=${c.id}`} style={cat === c.id ? { fontWeight: 700 } : undefined}>{c.name}</Link></span>)}</p></div></div>
-    <div className="section"><div className="container"><Grid products={products} />
-      {!products.length && <p>Aucun produit trouvé.</p>}
-      <div className="lx-notice"><strong>Produit introuvable ?</strong> Avec <Link href={`/outiko?type=outiko&details=${encodeURIComponent(q || "")}`}><strong>OUTIKO</strong></Link>, l&apos;équipe Lx le recherche pour vous.</div></div></div>
-  </>)
+    <PageHeader title={q ? `Résultats pour « ${q} »` : "Tous les produits"}>{products.length} produit(s) chez nos boutiques agréées</PageHeader>
+    <Container className="py-8">
+      <div className="mb-6 flex flex-wrap gap-2"><Link href="/store" className={chip(!cat)}>Tout</Link>{cats.map((c) => <Link key={c.id} href={`/store?cat=${c.id}`} className={chip(cat === c.id)}>{c.name}</Link>)}</div>
+      {products.length ? <ProductGrid products={products} /> : <EmptyState icon={PackageSearch}>Aucun produit trouvé.</EmptyState>}
+      <Banner tone="info" className="mt-8"><strong>Produit introuvable ?</strong> Avec <Link className="font-bold underline" href={`/outiko?type=outiko&details=${encodeURIComponent(q || "")}`}>OUTIKO</Link>, l&apos;équipe Lx le recherche pour vous.</Banner>
+    </Container></>)
 }

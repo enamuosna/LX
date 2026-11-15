@@ -1,12 +1,11 @@
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { CartProvider } from "@/lib/cart"
+import { ToastProvider } from "@/components/ui/Toast"
+import "./globals.css"
 
 export const metadata: Metadata = { title: "Lo Soxla ? / Lx — Conciergerie de courses et livraison au Sénégal", description: "Trouvez un produit chez nos boutiques agréées, on le livre. Sa Soxla, Sunu Soxla." }
+export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#0B7A43" }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (<html lang="fr"><head>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,600,700" rel="stylesheet" />
-    {["bootstrap.min", "font-awesome.min", "style", "lx", "vendor"].map((c) => <link key={c} rel="stylesheet" href={`/css/${c}.css`} />)}
-  </head><body><CartProvider>{children}</CartProvider></body></html>)
+  return (<html lang="fr"><body><CartProvider><ToastProvider>{children}</ToastProvider></CartProvider></body></html>)
 }

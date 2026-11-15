@@ -57,3 +57,11 @@ export async function listCategories() {
 export const price = (p: Product) => p.variants?.[0]?.calculated_price?.calculated_amount ?? 0
 export const stock = (p: Product) => p.variants?.[0]?.inventory_quantity ?? 0
 export const fcfa = (n: number) => `${Math.round(n).toLocaleString("fr-FR")} FCFA`.replace(/ /g, " ")
+
+/** Les images sont enregistrées avec l'adresse du moment (localhost…) : on les ramène à des chemins relatifs servis par la vitrine. */
+export const img = (u?: string | null, fallback = "/img/product01.png"): string => {
+  if (!u) return fallback
+  const m = u.match(/^https?:\/\/[^/]+(\/img\/.+)$/); if (m) return m[1]
+  const st = u.match(/^https?:\/\/[^/]+\/static\/(.+)$/); if (st) return `/medusa/static/${st[1]}`
+  return u
+}

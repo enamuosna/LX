@@ -3,7 +3,7 @@ import { getPk, SERVER_URL } from "@/lib/medusa"
 
 // Proxy same-origin vers l'API Medusa : le navigateur n'appelle que la vitrine.
 // Seules les routes publiques sont exposées : /store, /auth/shop (connexion boutique), /vendor (espace boutique).
-const ALLOWED = [/^store\//, /^auth\/shop\//, /^vendor(\/|$)/]
+const ALLOWED = [/^static\//, /^store\//, /^auth\/shop\//, /^vendor(\/|$)/]
 
 async function handler(req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
   const path = (await params).path.join("/")

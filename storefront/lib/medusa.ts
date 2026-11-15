@@ -65,3 +65,10 @@ export const img = (u?: string | null, fallback = "/img/product01.png"): string 
   const st = u.match(/^https?:\/\/[^/]+\/static\/(.+)$/); if (st) return `/medusa/static/${st[1]}`
   return u
 }
+
+export type RatingSummary = Record<string, { avg: number; count: number }>
+/** Moyenne et nombre d'avis pour une liste de produits (vide si le service est indisponible). */
+export async function getRatings(ids: string[]): Promise<RatingSummary> {
+  if (!ids.length) return {}
+  try { return (await store<{ summary: RatingSummary }>(`/store/lx/reviews?ids=${ids.join(",")}`)).summary } catch { return {} }
+}

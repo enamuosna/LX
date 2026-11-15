@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next"
 import { CartProvider } from "@/lib/cart"
+import { CustomerProvider } from "@/lib/customer"
+import { FavoritesProvider } from "@/lib/favorites"
 import { ToastProvider } from "@/components/ui/Toast"
 import "./globals.css"
 
@@ -7,5 +9,5 @@ export const metadata: Metadata = { title: "Lx, Lo Soxla ? Courses et livraison 
 export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#0B7A43" }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (<html lang="fr"><body><CartProvider><ToastProvider>{children}</ToastProvider></CartProvider></body></html>)
+  return (<html lang="fr"><body><CustomerProvider><FavoritesProvider><CartProvider><ToastProvider>{children}</ToastProvider></CartProvider></FavoritesProvider></CustomerProvider></body></html>)
 }

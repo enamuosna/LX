@@ -80,3 +80,14 @@ Admin Medusa > menu **Lx** : commandes par boutique (statuts, livreur, encaissem
 
 ## Admin en local
 Le conteneur tourne en production. En http://localhost le cookie de session est non sécurisé (`LX_COOKIE_SECURE=false`, défaut). Derrière un domaine https ou un tunnel Cloudflare, mettre `LX_COOKIE_SECURE=true`.
+
+## Fonctions avancées
+**Espace client** (`/account`) : compte (inscription, connexion), historique des commandes avec suivi, adresses enregistrées (préremplies au paiement), favoris (synchronisés avec le compte), avis notés de 1 à 5 étoiles, publiés uniquement après livraison.
+
+**Espace boutique** : statistiques sur 14 jours (graphique, produits les plus vendus, taux d'acceptation), alerte sonore et notification du navigateur à chaque nouvelle commande, export CSV des commandes, promotion en un champ (prix barré).
+
+**Paiement et livraison**
+- Zones de livraison avec frais différents (créées par `seed-zones`, modifiables dans l'admin Medusa : Paramètres, Expéditions).
+- Codes promo : `BIENVENUE10` (-10 %) existe par défaut. Les autres se créent dans l'admin Medusa, menu Promotions.
+- Wave et Orange Money : le client envoie le montant au numéro `LX_WAVE_NUMBER` / `LX_OM_NUMBER` puis saisit la référence ; l'équipe Lx la voit dans l'admin (menu Lx) et clique sur « Marquer payé ». Il n'y a pas d'appel à l'API Wave ou Orange Money : cela demande un compte marchand et des clés.
+- Code de livraison à 4 chiffres : affiché au client, demandé au livreur. L'admin Lx ne peut passer une commande à « Livrée » qu'avec ce code.

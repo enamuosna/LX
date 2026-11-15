@@ -1,6 +1,7 @@
 "use client"
-import { Banknote, Bell, CheckCircle2, Inbox, Truck } from "lucide-react"
+import { Banknote, Bell, BellOff, BellRing, CheckCircle2, Download, Inbox, Truck } from "lucide-react"
 import { useCallback, useEffect, useMemo, useState } from "react"
+import Button from "@/components/ui/Button"
 import Banner from "@/components/ui/Banner"
 import EmptyState from "@/components/ui/EmptyState"
 import Skeleton from "@/components/ui/Skeleton"
@@ -9,7 +10,8 @@ import OrderCard, { LIMIT_MIN } from "@/components/vendor/OrderCard"
 import Shell, { useVendor } from "@/components/vendor/Shell"
 import { cn } from "@/lib/cn"
 import { fcfa } from "@/lib/medusa"
-import { vendorApi } from "@/lib/vendor"
+import { vendorApi, vendorDownload } from "@/lib/vendor"
+import { useOrderAlerts } from "@/components/vendor/useOrderAlerts"
 
 const FILTERS: [string, string][] = [["all", "Toutes"], ["pending", "À traiter"], ["confirmed", "Confirmées"], ["picked_up", "En route"], ["delivered", "Livrées"], ["closed", "Refusées / annulées"]]
 const match = (o: any, f: string) => f === "all" || (f === "closed" ? ["rejected", "cancelled"].includes(o.status) : o.status === f)
@@ -30,8 +32,12 @@ function Dashboard() {
     return { todo: l.filter((o) => o.status === "pending").length, run: l.filter((o) => ["confirmed", "picked_up"].includes(o.status)).length, done: l.filter((o) => o.status === "delivered").length, sales: l.filter((o) => o.status === "delivered").reduce((s, o) => s + o.subtotal, 0), late: l.filter((o) => o.status === "pending" && o.escalated).length }
   }, [orders])
   const shown = (orders || []).filter((o) => match(o, filter))
+  const pendingIds = useMemo(() => orders ? orders.filter((o) => o.status === "pending").map((o) => o.id) : null, [orders])
+  const { enabled, toggle } = useOrderAlerts(pendingIds, (n) => toast(`${n} nouvelle(s) commande(s) à confirmer.`))
 
   return (<div className="space-y-6">
+    <div className="flex flex-wrap gap-2"><Button variant={enabled ? "primary" : "secondary"} size="sm" onClick={toggle} data-testid="alerts-toggle">{enabled ? <BellRing className="size-4" /> : <BellOff className="size-4" />}{enabled ? "Alertes sonores activées" : "Activer les alertes sonores"}</Button>
+      <Button variant="secondary" size="sm" data-testid="export-csv" onClick={() => vendorDownload("/orders/export", "commandes-lx.csv").catch((e) => toast(e.message, true))}><Download className="size-4" />Exporter en CSV</Button></div>
     {stats.late > 0 && <Banner tone="danger" title={`${stats.late} commande(s) sans réponse depuis plus de ${LIMIT_MIN} min.`}>Lx a été prévenu : confirmez ou refusez rapidement pour éviter une annulation.</Banner>}
     <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
       <StatCard icon={Bell} tone="orange" value={<CountUp value={stats.todo} />} label="À traiter" highlight={stats.todo > 0} />

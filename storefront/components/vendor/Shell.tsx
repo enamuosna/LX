@@ -1,5 +1,5 @@
 "use client"
-import { Boxes, Info, LayoutDashboard, LogOut, MessageCircle } from "lucide-react"
+import { BarChart3, Boxes, LayoutDashboard, LogOut, MessageCircle } from "lucide-react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { createContext, useContext, useEffect, useState } from "react"
@@ -16,7 +16,7 @@ type Ctx = { shop: any; toast: (msg: string, err?: boolean) => void; pending: nu
 const V = createContext<Ctx>(null as any)
 export const useVendor = () => useContext(V)
 
-const NAV = [{ href: "/vendor", icon: LayoutDashboard, label: "Tableau de bord" }, { href: "/vendor/products", icon: Boxes, label: "Mes produits" }]
+const NAV = [{ href: "/vendor", icon: LayoutDashboard, label: "Tableau de bord" }, { href: "/vendor/products", icon: Boxes, label: "Mes produits" }, { href: "/vendor/stats", icon: BarChart3, label: "Statistiques" }]
 const SHOP_STATUS: Record<string, [string, "orange" | "green" | "red"]> = { pending: ["En attente de validation", "orange"], approved: ["Boutique agréée", "green"], suspended: ["Suspendue", "red"] }
 
 export default function Shell({ title, subtitle, actions, children }: { title: string; subtitle?: string; actions?: React.ReactNode; children: React.ReactNode }) {

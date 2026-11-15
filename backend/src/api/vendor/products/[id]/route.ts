@@ -9,7 +9,7 @@ export async function POST(req: AuthenticatedMedusaRequest, res: MedusaResponse)
   const shop = await currentShop(req)
   if (shop.status !== "approved") return res.status(403).json({ message: "Boutique non validée par Lx." })
   const query = req.scope.resolve(ContainerRegistrationKeys.QUERY)
-  const { data: [p] } = await query.graph({ entity: "product", fields: ["id", "shop.id", "variants.id", "variants.inventory_items.inventory_item_id"], filters: { id: req.params.id } })
+  const { data: [p] } = await query.graph({ entity: "product", fields: ["id", "metadata", "shop.id", "variants.id", "variants.inventory_items.inventory_item_id"], filters: { id: req.params.id } })
   if (!p || (p as any).shop?.id !== shop.id) return res.status(404).json({ message: "Produit introuvable." })
   const b = (req.body || {}) as any
   const update: any = {}
@@ -21,6 +21,8 @@ export async function POST(req: AuthenticatedMedusaRequest, res: MedusaResponse)
     const price = Math.round(Number(b.price)); if (!(price > 0)) return res.status(400).json({ message: "Prix invalide." })
     update.variants = [{ id: variant.id, prices: [{ currency_code: "xof", amount: price }] }]
   }
+  // Promotion : old_price = ancien prix barré affiché à côté du prix ; null/0 retire la promotion.
+  if (b.old_price !== undefined) update.metadata = { ...((p as any).metadata || {}), old_price: Number(b.old_price) > 0 ? Math.round(Number(b.old_price)) : null }
   if (Object.keys(update).length) await updateProductsWorkflow(req.scope).run({ input: { selector: { id: p.id }, update } })
   if (b.stock !== undefined) {
     const ctx = await defaultCommerceContext(req.scope), itemId = variant?.inventory_items?.[0]?.inventory_item_id

@@ -18,3 +18,11 @@ export async function vendorApi<T = any>(path: string, body?: unknown): Promise<
   if (!r.ok) throw new Error(j.message || "Erreur")
   return j
 }
+
+/** Télécharge un fichier protégé (export CSV) avec le jeton boutique. */
+export async function vendorDownload(path: string, filename: string) {
+  const r = await fetch(`${BASE}/vendor${path}`, { headers: { Authorization: `Bearer ${vendorToken()}` } })
+  if (!r.ok) throw new Error("Export impossible.")
+  const url = URL.createObjectURL(await r.blob()), a = document.createElement("a")
+  a.href = url; a.download = filename; a.click(); URL.revokeObjectURL(url)
+}

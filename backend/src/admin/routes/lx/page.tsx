@@ -57,10 +57,10 @@ const LxPage = () => {
         <>#{o.order_display_id}<br /><small>{new Date(o.created_at).toLocaleString("fr-FR")}</small></>,
         <>{o.customer_name}<br /><small>{o.customer_phone}<br />{o.address}</small></>,
         <>{o.shop?.name}{o.whatsapp_link && <><br /><a href={o.whatsapp_link} target="_blank" rel="noreferrer">📲 Alerter par WhatsApp</a></>}</>,
-        <>{(o.items as any[]).map((i, k) => <div key={k}>{i.quantity} × {i.title}</div>)}<b>{fcfa(o.subtotal)}</b><br /><small>{o.payment_status === "paid" ? "payé" : "non payé"}</small></>,
+        <>{(o.items as any[]).map((i, k) => <div key={k}>{i.quantity} × {i.title}</div>)}<b>{fcfa(o.subtotal)}</b><br /><small>{o.payment_status === "paid" ? "payé" : "non payé"}{o.payment_method && o.payment_method !== "cod" ? `, ${o.payment_method}${o.payment_ref ? " réf. " + o.payment_ref : ""}` : ""}</small></>,
         <><Badge color={color(o.status)}>{LABEL[o.status]}</Badge>{o.escalated && o.status === "pending" && <div><small>⚠ sans réponse boutique</small></div>}</>,
         <select value={o.courier?.id || ""} onChange={(e) => act(`shop-orders/${o.id}`, { courier_id: e.target.value })}><option value="">Aucun</option>{data.couriers.filter((c: any) => c.active).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}</select>,
-        <div className="flex flex-wrap gap-1">{NEXT[o.status].map((n) => <Button key={n} size="small" variant="secondary" onClick={() => act(`shop-orders/${o.id}`, { status: n })}>{ACTION[n]}</Button>)}
+        <div className="flex flex-wrap gap-1">{NEXT[o.status].map((n) => <Button key={n} size="small" variant="secondary" onClick={() => { if (n === "delivered") { const code = window.prompt("Code de livraison donné par le client (4 chiffres) :"); if (code === null) return; act(`shop-orders/${o.id}`, { status: n, code }) } else act(`shop-orders/${o.id}`, { status: n }) }}>{ACTION[n]}</Button>)}
           {o.payment_status === "unpaid" && <Button size="small" variant="secondary" onClick={() => act(`shop-orders/${o.id}`, { payment_status: "paid" })}>Marquer payé</Button>}</div>,
       ])} />}
 

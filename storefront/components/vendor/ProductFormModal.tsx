@@ -16,7 +16,7 @@ export default function ProductFormModal({ product, onDone, onClose }: { product
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); setBusy(true); const f = new FormData(e.currentTarget)
     try {
-      if (product) await vendorApi(`/products/${product.id}`, { name: f.get("name"), description: f.get("description"), price: Number(f.get("price")), stock: Number(f.get("stock")) })
+      if (product) await vendorApi(`/products/${product.id}`, { name: f.get("name"), description: f.get("description"), price: Number(f.get("price")), stock: Number(f.get("stock")), old_price: f.get("old_price") ? Number(f.get("old_price")) : 0 })
       else {
         const body: any = { name: f.get("name"), description: f.get("description"), price: f.get("price"), old_price: f.get("old_price") || undefined, stock: f.get("stock") }
         const file = f.get("image") as File; if (file && file.size) { body.image_mime = file.type; body.image_base64 = await toB64(file) }
@@ -32,7 +32,7 @@ export default function ProductFormModal({ product, onDone, onClose }: { product
       <div className="grid grid-cols-2 gap-4">
         <Field label="Prix (FCFA)">{(id) => <Input id={id} type="number" min={1} name="price" defaultValue={product ? priceOf(product) : ""} required />}</Field>
         <Field label="Stock">{(id) => <Input id={id} type="number" min={0} name="stock" defaultValue={product ? stockOf(product) : 1} required />}</Field></div>
-      {!product && <Field label="Ancien prix / promotion (optionnel)">{(id) => <Input id={id} type="number" min={0} name="old_price" placeholder="Prix barré affiché" />}</Field>}
+      <Field label="Prix avant promotion (optionnel)" hint="Affiché barré à côté du prix : vos clients voient la promotion. Videz le champ pour la retirer.">{(id) => <Input id={id} type="number" min={0} name="old_price" defaultValue={product?.metadata?.old_price ?? ""} placeholder="ex : 60000" data-testid="old-price" />}</Field>
       <Field label="Caractéristiques">{(id) => <Textarea id={id} name="description" defaultValue={product?.description || ""} placeholder="Marque, modèle, état, garantie…" />}</Field>
       {!product && <Field label="Photo">{(id) => <label htmlFor={id} className="block cursor-pointer rounded-xl border-2 border-dashed border-slate-300 p-4 text-center text-sm text-slate-500 transition hover:border-brand-600 hover:bg-brand-50">
         {preview ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={preview} alt="" className="mx-auto mb-2 max-h-32 rounded-lg" /> : <Camera className="mx-auto mb-2 size-7" />}

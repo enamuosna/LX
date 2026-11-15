@@ -16,6 +16,9 @@ const ShopOrder = model.define("shop_order", {
   customer_phone: model.text(), // normalisé (chiffres uniquement)
   address: model.text(),
   note: model.text().nullable(),
+  delivery_code: model.text().nullable(), // code à 4 chiffres : le client le donne au livreur à la remise du colis
+  payment_method: model.text().nullable(), // cod | wave | orange_money | card
+  payment_ref: model.text().nullable(), // référence de la transaction mobile money
   items: model.json(), // [{title, quantity, unit_price, product_id}]
   subtotal: model.number(),
   shop: model.belongsTo(() => Shop, { mappedBy: "orders" }),

@@ -1,13 +1,15 @@
 "use client"
 import { createContext, useCallback, useContext, useEffect, useState } from "react"
-import { getRegionId, post, store } from "./medusa"
+import { customerHeaders } from "./customer"
+import { getRegionId, store } from "./medusa"
+const post = (path: string, body: unknown) => store(path, { method: "POST", body: JSON.stringify(body), headers: customerHeaders() })
 
-export type Cart = { id: string; items: { id: string; title: string; quantity: number; unit_price: number; thumbnail?: string; variant_id: string; subtotal: number; metadata?: any }[]; subtotal: number; shipping_total: number; total: number }
+export type Cart = { id: string; items: { id: string; title: string; quantity: number; unit_price: number; thumbnail?: string; variant_id: string; subtotal: number; metadata?: any }[]; subtotal: number; shipping_total: number; discount_total?: number; total: number; promotions?: { code?: string }[] }
 type Ctx = { cart: Cart | null; count: number; busy: boolean; add: (variantId: string, qty?: number) => Promise<void>; setQty: (lineId: string, q: number) => Promise<void>; remove: (lineId: string) => Promise<void>; reload: () => Promise<void>; reset: () => void; setCart: (c: Cart | null) => void }
 const C = createContext<Ctx>(null as any)
 export const useCart = () => useContext(C)
 const KEY = "lx_cart_id"
-const FIELDS = "*items,+items.thumbnail,*shipping_methods"
+const FIELDS = "*items,+items.thumbnail,*shipping_methods,*promotions"
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<Cart | null>(null)

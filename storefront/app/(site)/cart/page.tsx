@@ -26,7 +26,7 @@ export default function CartPage() {
         <aside className="h-fit space-y-4 rounded-2xl border border-line bg-surface p-6">
           <h2 className="text-lg font-bold">Récapitulatif</h2>
           <div className="flex justify-between"><span>Sous-total produits</span><strong data-testid="cart-subtotal">{fcfa(cart!.subtotal)}</strong></div>
-          <p className="text-sm text-slate-500">Les frais de livraison Lx sont ajoutés à l&apos;étape suivante.</p>
+          <p className="text-sm text-slate-500">Les frais de livraison dépendent de votre zone, choisie à l&apos;étape suivante.</p>
           <Button href="/checkout" size="lg" full>Valider ma commande</Button>
           <Link href="/store" className="block text-center text-sm font-semibold text-brand-600">Continuer mes achats</Link></aside></div>}
     </Container></>)

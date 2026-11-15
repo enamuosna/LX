@@ -1,7 +1,7 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { lx, norm, validPhone } from "../../../../lib/lx"
 
-// OUTIKO / JEULIKO — demande publique du client.
+// OUTIKO / JEULIKO : demande publique du client.
 export async function POST(req: MedusaRequest, res: MedusaResponse) {
   const b = (req.body || {}) as any
   const type = b.type === "jeuliko" ? "jeuliko" : "outiko"

@@ -26,8 +26,8 @@ Cliquez **Deploy**. Premier déploiement : 5 à 10 min (build + migrations + don
 | Quoi | Adresse |
 |---|---|
 | Vitrine | domaine de **storefront** |
-| Admin Medusa (menu Lx) | domaine de **backend** + `/app` — `ADMIN_EMAIL` / `ADMIN_PASSWORD` |
-| Espace boutique | vitrine + `/vendor` — `boutique@lx.sn` / `ChangeMe!2026` |
+| Admin Medusa (menu Lx) | domaine de **backend** + `/app` : `ADMIN_EMAIL` / `ADMIN_PASSWORD` |
+| Espace boutique | vitrine + `/vendor` : `boutique@lx.sn` / `ChangeMe!2026` |
 
 ## 6. Après le premier test
 - Changez le mot de passe du compte boutique de démonstration (ou supprimez-le).

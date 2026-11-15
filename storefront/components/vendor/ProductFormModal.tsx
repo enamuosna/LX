@@ -36,7 +36,7 @@ export default function ProductFormModal({ product, onDone, onClose }: { product
       <Field label="Caractéristiques">{(id) => <Textarea id={id} name="description" defaultValue={product?.description || ""} placeholder="Marque, modèle, état, garantie…" />}</Field>
       {!product && <Field label="Photo">{(id) => <label htmlFor={id} className="block cursor-pointer rounded-xl border-2 border-dashed border-slate-300 p-4 text-center text-sm text-slate-500 transition hover:border-brand-600 hover:bg-brand-50">
         {preview ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={preview} alt="" className="mx-auto mb-2 max-h-32 rounded-lg" /> : <Camera className="mx-auto mb-2 size-7" />}
-        {preview ? "Changer la photo" : "Cliquez pour choisir une image (JPG, PNG, WebP · 2 Mo max)"}
+        {preview ? "Changer la photo" : "Cliquez pour choisir une image (JPG, PNG ou WebP, 2 Mo max)"}
         <input id={id} type="file" name="image" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(e) => { const x = e.target.files?.[0]; setPreview(x ? URL.createObjectURL(x) : null) }} /></label>}</Field>}
     </form></Modal>)
 }

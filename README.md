@@ -1,7 +1,7 @@
-# Lx — « Lo Soxla ? » — Architecture headless (API-first)
+# Lx, « Lo Soxla ? » : architecture headless (API-first)
 
 - **backend/** : Medusa.js v2 (Node 20+, PostgreSQL) + module métier `lx`
-- **storefront/** : Next.js 15 (App Router, React 19, TypeScript) — bibliothèque de composants React (`components/ui` : Button, Card, Modal, Field, Toast…) + Tailwind CSS v4, icônes lucide-react
+- **storefront/** : Next.js 15 (App Router, React 19, TypeScript) : bibliothèque de composants React (`components/ui` : Button, Card, Modal, Field, Toast…) + Tailwind CSS v4, icônes lucide-react
 
 ## Lancement avec Docker (recommandé)
 Prérequis : Docker Desktop démarré.
@@ -14,8 +14,8 @@ Le premier démarrage (3 à 6 min) construit les images, crée la base, applique
 | Service | Adresse |
 |---|---|
 | Vitrine | http://localhost:3000 |
-| Admin Medusa (menu **Lx**) | http://localhost:9000/app — `admin@lx.sn` / `ChangeMe!2026` |
-| Espace boutique | http://localhost:3000/vendor — `boutique@lx.sn` / `ChangeMe!2026` |
+| Admin Medusa (menu **Lx**) | http://localhost:9000/app : `admin@lx.sn` / `ChangeMe!2026` |
+| Espace boutique | http://localhost:3000/vendor : `boutique@lx.sn` / `ChangeMe!2026` |
 
 - Aucune clé à copier : la vitrine récupère seule sa clé publique et appelle l'API via son propre proxy (`/medusa/*`, pas de CORS).
 - Données persistantes : volumes `pgdata` (base) et `uploads` (photos produits). `docker compose down` les conserve ; `docker compose down -v` efface tout.
@@ -36,7 +36,7 @@ npm install
 npx medusa db:migrate         # tables Medusa + module Lx + liens
 npm run seed                  # région Sénégal (FCFA), livraison, boutique + produits de démo, clé publique
 npx medusa user -e admin@lx.sn -p 'MotDePasseSolide'
-npm run dev                   # API http://localhost:9000 — Admin http://localhost:9000/app
+npm run dev                   # API http://localhost:9000 : Admin http://localhost:9000/app
 
 # 3. Storefront
 cd ../storefront

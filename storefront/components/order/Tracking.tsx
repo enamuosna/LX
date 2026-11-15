@@ -6,7 +6,7 @@ import { Card, CardBody, CardHeader } from "@/components/ui/Card"
 import Stepper from "@/components/ui/Stepper"
 import { fcfa, store } from "@/lib/medusa"
 
-const LABEL: Record<string, string> = { pending: "En attente boutique", confirmed: "Confirmée", rejected: "Refusée par la boutique", picked_up: "Colis récupéré – en route", delivered: "Livrée", cancelled: "Annulée" }
+const LABEL: Record<string, string> = { pending: "En attente boutique", confirmed: "Confirmée", rejected: "Refusée par la boutique", picked_up: "Colis récupéré, en route", delivered: "Livrée", cancelled: "Annulée" }
 const TONE: Record<string, Tone> = { pending: "orange", confirmed: "blue", picked_up: "blue", delivered: "green", rejected: "red", cancelled: "red" }
 const STEPS = ["Reçue", "Confirmée", "En route", "Livrée"], IDX: Record<string, number> = { pending: 0, confirmed: 1, picked_up: 2, delivered: 3 }
 
@@ -26,7 +26,7 @@ export default function Tracking({ refNo, phone }: { refNo: string; phone: strin
       {s.status in IDX && <Stepper steps={STEPS} current={IDX[s.status]} finished={s.status === "delivered"} />}
       <CardBody className="space-y-3">
         {s.status === "pending" && s.escalated && <Banner tone="warn">Lx a pris le relais auprès de la boutique.</Banner>}
-        <p className="text-sm text-slate-600">{s.courier ? <>Livreur : <strong>{s.courier}</strong> · </> : null}Paiement : {s.payment_status === "paid" ? "payé" : "à régler"}</p>
+        <p className="text-sm text-slate-600">{s.courier ? <>Livreur : <strong>{s.courier}</strong>. </> : null}Paiement : {s.payment_status === "paid" ? "payé" : "à régler"}</p>
         <ul className="divide-y divide-line text-sm">{s.items.map((i: any, k: number) => <li key={k} className="flex justify-between py-2"><span>{i.quantity} × {i.title}</span><span className="font-semibold">{fcfa(i.unit_price * i.quantity)}</span></li>)}
           <li className="flex justify-between py-2 font-bold"><span>Total produits</span><span>{fcfa(s.subtotal)}</span></li></ul></CardBody></Card>))}
     <p className="text-xs text-slate-500">Les frais de livraison Lx sont inclus dans le total de la commande. Cette page se met à jour automatiquement.</p></div>)

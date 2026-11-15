@@ -22,7 +22,7 @@ export default async function seedLx({ container }: ExecArgs) {
 
   // Rejouable : si la région Sénégal existe déjà, on ne refait rien (démarrages Docker successifs).
   const { data: existing } = await query.graph({ entity: "region", fields: ["id"] })
-  if (existing.length) { logger.info("Seed Lx déjà appliqué — rien à faire."); return }
+  if (existing.length) { logger.info("Seed Lx déjà appliqué, rien à faire."); return }
 
   const [store] = await storeModule.listStores()
   const { result: [channel] } = await createSalesChannelsWorkflow(container).run({ input: { salesChannelsData: [{ name: "Lx Sénégal" }] } })
@@ -72,7 +72,7 @@ export default async function seedLx({ container }: ExecArgs) {
   ]
   const { result: products } = await createProductsWorkflow(container).run({ input: { products: items.map(([title, c, price, old, img, handle]) => ({
     title, handle, status: ProductStatus.PUBLISHED, category_ids: [cat(c)], shipping_profile_id: profile.id,
-    description: `${title} — vendu par une boutique agréée, garantie légale de conformité.`,
+    description: `${title}, vendu par une boutique agréée. Garantie légale de conformité.`,
     thumbnail: `${front}/img/${img}.png`, images: [{ url: `${front}/img/${img}.png` }],
     sales_channels: [{ id: channel.id }], metadata: { old_price: old, shop_id: shop.id, shop_name: shop.name },
     options: [{ title: "Défaut", values: ["Standard"] }],
@@ -84,5 +84,5 @@ export default async function seedLx({ container }: ExecArgs) {
   await createInventoryLevelsWorkflow(container).run({ input: { inventory_levels: variants.flatMap((v: any) => v.inventory_items.map((i: any) => ({ inventory_item_id: i.inventory_item_id, location_id: loc.id, stocked_quantity: 10 }))) } })
 
   logger.info(`Seed Lx terminé. Clé publique (storefront) : ${(pk as any).token}`)
-  logger.info("Vendeur démo : boutique@lx.sn / ChangeMe!2026  — créez l'admin : npx medusa user -e admin@lx.sn -p <mot-de-passe>")
+  logger.info("Vendeur démo : boutique@lx.sn / ChangeMe!2026. Créez l'admin : npx medusa user -e admin@lx.sn -p <mot-de-passe>")
 }

@@ -44,7 +44,7 @@ const LxPage = () => {
   return (
     <Container className="divide-y p-0">
       <div className="px-6 py-4">
-        <Heading>Lx — Exploitation</Heading>
+        <Heading>Lx : exploitation</Heading>
         <Text className="text-ui-fg-subtle">{data.orders.length} sous-commandes · {late} à relancer · {data.shops.filter((s: any) => s.status === "pending").length} boutique(s) à valider</Text>
         <div className="mt-3 flex gap-2">
           {([["orders", "Commandes boutiques"], ["shops", "Boutiques"], ["requests", "OUTIKO / JEULIKO"], ["couriers", "Livreurs"]] as const).map(([k, l]) =>
@@ -59,7 +59,7 @@ const LxPage = () => {
         <>{o.shop?.name}{o.whatsapp_link && <><br /><a href={o.whatsapp_link} target="_blank" rel="noreferrer">📲 Alerter par WhatsApp</a></>}</>,
         <>{(o.items as any[]).map((i, k) => <div key={k}>{i.quantity} × {i.title}</div>)}<b>{fcfa(o.subtotal)}</b><br /><small>{o.payment_status === "paid" ? "payé" : "non payé"}</small></>,
         <><Badge color={color(o.status)}>{LABEL[o.status]}</Badge>{o.escalated && o.status === "pending" && <div><small>⚠ sans réponse boutique</small></div>}</>,
-        <select value={o.courier?.id || ""} onChange={(e) => act(`shop-orders/${o.id}`, { courier_id: e.target.value })}><option value="">—</option>{data.couriers.filter((c: any) => c.active).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}</select>,
+        <select value={o.courier?.id || ""} onChange={(e) => act(`shop-orders/${o.id}`, { courier_id: e.target.value })}><option value="">Aucun</option>{data.couriers.filter((c: any) => c.active).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}</select>,
         <div className="flex flex-wrap gap-1">{NEXT[o.status].map((n) => <Button key={n} size="small" variant="secondary" onClick={() => act(`shop-orders/${o.id}`, { status: n })}>{ACTION[n]}</Button>)}
           {o.payment_status === "unpaid" && <Button size="small" variant="secondary" onClick={() => act(`shop-orders/${o.id}`, { payment_status: "paid" })}>Marquer payé</Button>}</div>,
       ])} />}

@@ -1,33 +1,59 @@
 @import "tailwindcss";
-@import "@fontsource-variable/montserrat";
+@import "@fontsource-variable/bricolage-grotesque";
+@import "@fontsource-variable/figtree";
 
-/* Identité Lx : vert profond + jaune soleil, encre sombre */
+/* Lx : vert de la Teranga, jaune soleil, rouge bissap en touche rare. Fond papier légèrement verdi. */
 @theme {
-  --font-sans: "Montserrat Variable", ui-sans-serif, system-ui, sans-serif;
-  --color-brand-50: #e9f6ef;
-  --color-brand-100: #cfeedd;
-  --color-brand-200: #9fdcbb;
-  --color-brand-500: #12a05c;
+  --font-sans: "Figtree Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Bricolage Grotesque Variable", "Figtree Variable", ui-sans-serif, sans-serif;
+  --color-brand-50: #e7f4ec;
+  --color-brand-100: #cbe9d6;
+  --color-brand-200: #98d2ae;
+  --color-brand-500: #14a15b;
   --color-brand-600: #0b7a43;
-  --color-brand-700: #08592f;
-  --color-brand-800: #064424;
-  --color-accent-400: #f7bd2e;
-  --color-accent-500: #f2a900;
-  --color-ink: #1e1f29;
-  --color-night: #15161d;
-  --color-surface: #f4f6f9;
-  --color-line: #e6e8ee;
-  --animate-fade-in: fade-in 0.15s ease-out;
-  --animate-slide-in: slide-in 0.25s ease-out;
-  --animate-shimmer: shimmer 1.2s infinite;
+  --color-brand-700: #085f34;
+  --color-brand-800: #064a29;
+  --color-accent-400: #ffd04a;
+  --color-accent-500: #ffc21a;
+  --color-bissap: #d7263d;
+  --color-ink: #10231a;
+  --color-night: #0e1f17;
+  --color-surface: #f1f4ec;
+  --color-line: #dde3d6;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --animate-fade-in: fade-in 0.2s ease-out;
+  --animate-pop-in: pop-in 0.35s var(--ease-spring);
+  --animate-slide-in: slide-in 0.4s var(--ease-out-expo);
+  --animate-page-in: page-in 0.5s var(--ease-out-expo);
+  --animate-rise: rise 0.8s var(--ease-out-expo) both;
+  --animate-shimmer: shimmer 1.4s infinite;
+  --animate-bump: bump 0.4s var(--ease-spring);
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-ping-soft: ping-soft 1.8s ease-out infinite;
+  --animate-marquee: marquee 38s linear infinite;
   @keyframes fade-in { from { opacity: 0 } }
-  @keyframes slide-in { from { opacity: 0; transform: translateX(24px) } }
+  @keyframes pop-in { from { opacity: 0; transform: translateY(12px) scale(0.95) } }
+  @keyframes slide-in { from { opacity: 0; transform: translateX(32px) } }
+  @keyframes page-in { from { opacity: 0; transform: translateY(8px) } }
+  @keyframes rise { from { opacity: 0; transform: translateY(28px) } }
   @keyframes shimmer { to { background-position: -200% 0 } }
+  @keyframes bump { 0% { transform: scale(1) } 40% { transform: scale(1.5) } 100% { transform: scale(1) } }
+  @keyframes float { 50% { transform: translateY(-10px) rotate(0.6deg) } }
+  @keyframes ping-soft { 0% { transform: scale(1); opacity: 0.7 } 100% { transform: scale(2.6); opacity: 0 } }
+  @keyframes marquee { to { transform: translateX(-50%) } }
 }
 
 @layer base {
   html { scroll-behavior: smooth; }
   body { @apply overflow-x-hidden bg-white font-sans text-ink antialiased; }
+  h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; text-wrap: balance; }
+  p { text-wrap: pretty; }
   button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer; }
   :focus-visible { @apply outline-2 outline-offset-2 outline-brand-600; }
+  ::selection { background: var(--color-accent-500); color: var(--color-ink); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }

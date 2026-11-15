@@ -1,28 +1,27 @@
 "use client"
-import { Check, ShoppingCart } from "lucide-react"
+import { Check, Plus } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
-import Badge from "@/components/ui/Badge"
-import Button from "@/components/ui/Button"
 import Price from "@/components/ui/Price"
 import StockBadge from "./StockBadge"
 import { useCart } from "@/lib/cart"
+import { cn } from "@/lib/cn"
 import { img, price, stock, type Product } from "@/lib/medusa"
 
 export default function ProductCard({ p }: { p: Product }) {
   const { add, busy } = useCart(); const [done, setDone] = useState(false)
-  const s = stock(p), v = p.variants?.[0]
-  return (<article data-testid="product-card" className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-white transition hover:-translate-y-0.5 hover:shadow-lg">
-    <Link href={`/products/${p.handle}`} className="relative block aspect-square bg-surface">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={img(p.thumbnail)} alt={p.title} className="size-full object-contain p-4 transition group-hover:scale-105" loading="lazy" />
-      {s > 0 && <Badge tone="solid" className="absolute left-3 top-3">Dispo</Badge>}</Link>
-    <div className="flex flex-1 flex-col gap-1.5 p-4">
-      <p className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">{p.categories?.[0]?.name ?? " "}</p>
-      <h3 className="line-clamp-2 min-h-10 font-bold leading-snug"><Link href={`/products/${p.handle}`} className="hover:text-brand-600">{p.title}</Link></h3>
-      <Price amount={price(p)} old={p.metadata?.old_price} className="text-lg" />
-      <StockBadge stock={s} shop={p.metadata?.shop_name} /></div>
-    <div className="p-4 pt-0">{s > 0 && v ? <Button full size="sm" disabled={busy} data-testid="add-card" onClick={async () => { await add(v.id); setDone(true); setTimeout(() => setDone(false), 1500) }}>
-      {done ? <><Check className="size-4" />Ajouté</> : <><ShoppingCart className="size-4" />Commander</>}</Button> : <Button full size="sm" variant="secondary" disabled>Indisponible</Button>}</div>
+  const s = stock(p), v = p.variants?.[0], canBuy = s > 0 && !!v
+  return (<article data-testid="product-card" className="group">
+    <div className="relative">
+      <Link href={`/products/${p.handle}`} className="block aspect-square overflow-hidden rounded-[1.75rem] bg-surface">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={img(p.thumbnail)} alt={p.title} loading="lazy" className={cn("size-full object-contain p-6 transition duration-500 ease-out group-hover:-translate-y-1 group-hover:scale-[1.06] group-hover:-rotate-2", s === 0 && "opacity-40 grayscale")} /></Link>
+      {canBuy && <button data-testid="add-card" aria-label={`Commander ${p.title}`} disabled={busy} onClick={async () => { await add(v!.id); setDone(true); setTimeout(() => setDone(false), 1600) }}
+        className={cn("absolute bottom-3 right-3 grid size-11 place-items-center rounded-full shadow-lg transition duration-300 active:scale-90", done ? "scale-110 bg-accent-500 text-ink" : "bg-ink text-white hover:bg-brand-600 md:translate-y-2 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100 md:focus-visible:translate-y-0 md:focus-visible:opacity-100")}>
+        {done ? <Check className="size-5 animate-pop-in" strokeWidth={3} /> : <Plus className="size-5" strokeWidth={2.5} />}</button>}</div>
+    <div className="px-1 pt-3.5">
+      <h3 className="line-clamp-2 text-[17px] font-bold leading-snug"><Link href={`/products/${p.handle}`} className="hover:text-brand-600">{p.title}</Link></h3>
+      <div className="mt-1 flex items-baseline justify-between gap-2"><Price amount={price(p)} old={p.metadata?.old_price} className="text-lg" /></div>
+      <div className="mt-1"><StockBadge stock={s} shop={p.metadata?.shop_name} /></div></div>
   </article>)
 }

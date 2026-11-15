@@ -15,10 +15,10 @@ export default async function ProductPage({ params }: { params: Promise<{ handle
   if (!p) notFound()
   const s = stock(p)
   return (<Container className="py-10"><div className="grid gap-10 md:grid-cols-2">
-    <div className="grid aspect-square place-items-center rounded-2xl border border-line bg-surface p-6">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={img(p.thumbnail)} alt={p.title} className="max-h-full object-contain" /></div>
+    <div className="grid aspect-square place-items-center rounded-3xl bg-surface p-8">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={img(p.thumbnail)} alt={p.title} className="max-h-full object-contain" /></div>
     <div className="space-y-4">
-      <Link href="/store" className="text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-brand-600">{p.categories?.[0]?.name ?? "Produits"}</Link>
-      <h1 className="text-3xl font-extrabold">{p.title}</h1>
+      <Link href="/store" className="text-sm font-semibold text-slate-500 hover:text-brand-600">{p.categories?.[0]?.name ?? "Produits"}</Link>
+      <h1 className="text-4xl font-extrabold">{p.title}</h1>
       <Price amount={price(p)} old={p.metadata?.old_price} className="text-3xl" />
       <div className="flex flex-wrap items-center gap-3 text-sm"><StockBadge stock={s} />{s > 0 && <span className="text-slate-500">({s} disponible{s > 1 ? "s" : ""})</span>}
         {p.metadata?.shop_name && <span className="inline-flex items-center gap-1.5 text-slate-600"><Store className="size-4" />Vendu par <strong>{p.metadata.shop_name}</strong></span>}</div>

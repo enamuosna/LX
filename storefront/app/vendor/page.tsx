@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import Banner from "@/components/ui/Banner"
 import EmptyState from "@/components/ui/EmptyState"
 import Skeleton from "@/components/ui/Skeleton"
-import StatCard from "@/components/ui/StatCard"
+import StatCard, { CountUp } from "@/components/ui/StatCard"
 import OrderCard, { LIMIT_MIN } from "@/components/vendor/OrderCard"
 import Shell, { useVendor } from "@/components/vendor/Shell"
 import { cn } from "@/lib/cn"
@@ -23,7 +23,7 @@ function Dashboard() {
   const act = async (o: any, action: "confirm" | "reject") => {
     if (action === "reject" && !confirm(`Refuser la commande #${o.order_display_id} ?`)) return
     setBusy(o.id)
-    try { await vendorApi(`/orders/${o.id}`, { action }); toast(action === "confirm" ? "Commande confirmée — le livreur Lx passera récupérer le colis scellé." : "Commande refusée."); await load() } catch (e: any) { toast(e.message, true) } finally { setBusy(null) }
+    try { await vendorApi(`/orders/${o.id}`, { action }); toast(action === "confirm" ? "Commande confirmée. Le livreur Lx passera récupérer le colis scellé." : "Commande refusée."); await load() } catch (e: any) { toast(e.message, true) } finally { setBusy(null) }
   }
   const stats = useMemo(() => {
     const l = orders || []
@@ -34,10 +34,10 @@ function Dashboard() {
   return (<div className="space-y-6">
     {stats.late > 0 && <Banner tone="danger" title={`${stats.late} commande(s) sans réponse depuis plus de ${LIMIT_MIN} min.`}>Lx a été prévenu : confirmez ou refusez rapidement pour éviter une annulation.</Banner>}
     <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
-      <StatCard icon={Bell} tone="orange" value={stats.todo} label="À traiter" highlight={stats.todo > 0} />
-      <StatCard icon={Truck} tone="blue" value={stats.run} label="En cours de livraison" />
-      <StatCard icon={CheckCircle2} tone="green" value={stats.done} label="Commandes livrées" />
-      <StatCard icon={Banknote} tone="yellow" value={<span className="text-lg sm:text-xl">{fcfa(stats.sales)}</span>} label="Ventes livrées" /></div>
+      <StatCard icon={Bell} tone="orange" value={<CountUp value={stats.todo} />} label="À traiter" highlight={stats.todo > 0} />
+      <StatCard icon={Truck} tone="blue" value={<CountUp value={stats.run} />} label="En cours de livraison" />
+      <StatCard icon={CheckCircle2} tone="green" value={<CountUp value={stats.done} />} label="Commandes livrées" />
+      <StatCard icon={Banknote} tone="yellow" value={<span className="text-lg sm:text-xl"><CountUp value={stats.sales} format={fcfa} /></span>} label="Ventes livrées" /></div>
     <div className="flex flex-wrap items-center gap-2">{FILTERS.map(([f, l]) => (
       <button key={f} onClick={() => setFilter(f)} data-testid={`filter-${f}`} className={cn("flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[13px] font-semibold transition", filter === f ? "border-brand-600 bg-brand-600 text-white" : "border-line bg-white hover:border-brand-600")}>
         {l}<span className={cn("rounded-full px-1.5 text-[11px]", filter === f ? "bg-white/25" : "bg-surface")}>{(orders || []).filter((o) => match(o, f)).length}</span></button>))}

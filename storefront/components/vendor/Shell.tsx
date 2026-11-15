@@ -33,16 +33,16 @@ export default function Shell({ title, subtitle, actions, children }: { title: s
   return (<V.Provider value={{ shop, toast, pending, setPending }}>
     <div className="min-h-screen bg-surface lg:grid lg:grid-cols-[260px_1fr]">
       <aside className="sticky top-0 hidden h-screen flex-col bg-night p-5 text-white lg:flex">
-        <div className="flex items-end gap-2"><Logo tagline={false} href="/vendor" /><span className="mb-1 text-[11px] leading-tight text-slate-400">Lo Soxla ?<br />Espace boutique</span></div>
+        <div className="flex items-end gap-2"><Logo tone="light" tagline={false} href="/vendor" /><span className="mb-1 text-[11px] leading-tight text-slate-400">Lo Soxla ?<br />Espace boutique</span></div>
         <div className="mt-6 rounded-2xl bg-white/5 p-4"><div className="font-bold">{shop.name}</div>
           <div className="mt-1 flex items-center gap-1.5 text-xs text-slate-400"><MessageCircle className="size-3.5" />+{shop.phone}</div><Badge tone={stTone} className="mt-3">{stLabel}</Badge></div>
         <nav className="mt-6 flex flex-col gap-1">{NAV.map((n) => link(n))}</nav>
         <div className="mt-auto flex items-center justify-between border-t border-white/10 pt-4 text-sm text-slate-400">
-          <Link href="/" className="hover:text-white">← Site</Link><button onClick={logout} className="flex items-center gap-1.5 hover:text-white"><LogOut className="size-4" />Déconnexion</button></div></aside>
+          <Link href="/" className="hover:text-white">Retour au site</Link><button onClick={logout} className="flex items-center gap-1.5 hover:text-white"><LogOut className="size-4" />Déconnexion</button></div></aside>
 
       <div className="min-w-0">
         <div className="sticky top-0 z-30 bg-night text-white lg:hidden">
-          <div className="flex items-center justify-between px-4 py-3"><Logo tagline={false} href="/vendor" className="[&>span]:text-3xl" /><span className="truncate px-3 text-sm font-semibold">{shop.name}</span>
+          <div className="flex items-center justify-between px-4 py-3"><Logo tone="light" tagline={false} href="/vendor" /><span className="truncate px-3 text-sm font-semibold">{shop.name}</span>
             <button onClick={logout} aria-label="Déconnexion" className="grid size-9 place-items-center rounded-full hover:bg-white/10"><LogOut className="size-5" /></button></div>
           <nav className="flex gap-1 overflow-x-auto px-3 pb-3">{NAV.map((n) => link(n, true))}</nav></div>
         <main className="mx-auto max-w-6xl p-4 sm:p-8">

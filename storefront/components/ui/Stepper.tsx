@@ -1,12 +1,16 @@
 import { Check } from "lucide-react"
 import { cn } from "@/lib/cn"
-/** Barre de progression horizontale : étapes terminées, étape courante, étapes à venir. */
+/** Progression horizontale : le trait se remplit en douceur quand l'étape avance. */
 export default function Stepper({ steps, current, finished }: { steps: string[]; current: number; finished?: boolean }) {
-  return (<ol className="flex px-5 pt-5">{steps.map((s, i) => {
-    const done = i < current || !!finished, cur = i === current && !finished
-    return (<li key={s} className="relative flex-1 text-center text-[11.5px] font-semibold">
-      {i > 0 && <span className={cn("absolute left-[-50%] right-1/2 top-2.5 h-[3px]", done || cur ? "bg-brand-600" : "bg-line")} />}
-      <span className={cn("relative z-10 mx-auto mb-1.5 grid size-5 place-items-center rounded-full border-[3px] bg-white", done ? "border-brand-600 bg-brand-600 text-white" : cur ? "border-brand-600 ring-4 ring-brand-50" : "border-line")}>{done && <Check className="size-3" strokeWidth={4} />}</span>
-      <span className={cn(done ? "text-brand-600" : cur ? "text-ink" : "text-slate-400")}>{s}</span></li>)
-  })}</ol>)
+  const n = steps.length, idx = finished ? n - 1 : current, left = `${50 / n}%`
+  return (<div className="relative mx-6 mt-6">
+    <span className="absolute top-[10px] h-1 rounded bg-line" style={{ left, right: left }} aria-hidden />
+    <span className="absolute top-[10px] h-1 rounded bg-brand-600 transition-[width] duration-700 ease-out" style={{ left, width: `${(idx / n) * 100}%` }} aria-hidden />
+    <ol className="relative flex">{steps.map((s, i) => {
+      const done = i < idx || !!finished, cur = i === idx && !finished
+      return (<li key={s} className="flex-1 text-center text-xs font-semibold">
+        <span className={cn("relative mx-auto mb-2 grid size-6 place-items-center rounded-full border-[3px] transition-all duration-500", done ? "border-brand-600 bg-brand-600 text-white" : cur ? "border-brand-600 bg-white" : "border-line bg-white")}>
+          {done && <Check className="size-3 animate-pop-in" strokeWidth={4} />}{cur && <span className="absolute inset-0 animate-ping-soft rounded-full bg-brand-600/40" />}</span>
+        <span className={cn("transition-colors", done ? "text-brand-600" : cur ? "text-ink" : "text-slate-400")}>{s}</span></li>)
+    })}</ol></div>)
 }

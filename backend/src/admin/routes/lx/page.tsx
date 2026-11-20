@@ -2,13 +2,8 @@ import { defineRouteConfig } from "@medusajs/admin-sdk"
 import { BuildingStorefront } from "@medusajs/icons"
 import { Badge, Button, Container, Heading, Input, Text } from "@medusajs/ui"
 import { useCallback, useEffect, useState } from "react"
+import { api } from "./api"
 
-const api = async (path: string, body?: unknown) => {
-  const r = await fetch(`/admin/lx/${path}`, { credentials: "include", method: body === undefined ? "GET" : "POST", headers: { "Content-Type": "application/json" }, body: body === undefined ? undefined : JSON.stringify(body) })
-  const j = await r.json().catch(() => ({}))
-  if (!r.ok) throw new Error(j.message || "Erreur")
-  return j
-}
 const LABEL: Record<string, string> = { pending: "En attente boutique", confirmed: "Confirmée", rejected: "Refusée", picked_up: "Colis récupéré", delivered: "Livrée", cancelled: "Annulée" }
 const NEXT: Record<string, string[]> = { pending: ["confirmed", "rejected", "cancelled"], confirmed: ["picked_up", "cancelled"], picked_up: ["delivered"], rejected: [], delivered: [], cancelled: [] }
 const ACTION: Record<string, string> = { confirmed: "Confirmer", rejected: "Refuser", cancelled: "Annuler", picked_up: "Colis récupéré", delivered: "Livrée" }
@@ -56,7 +51,7 @@ const LxPage = () => {
       {tab === "orders" && <Table head={["Commande", "Client", "Boutique", "Articles", "Statut", "Livreur", "Actions"]} rows={data.orders.map((o: any) => [
         <>#{o.order_display_id}<br /><small>{new Date(o.created_at).toLocaleString("fr-FR")}</small></>,
         <>{o.customer_name}<br /><small>{o.customer_phone}<br />{o.address}</small></>,
-        <>{o.shop?.name}{o.whatsapp_link && <><br /><a href={o.whatsapp_link} target="_blank" rel="noreferrer">📲 Alerter par WhatsApp</a></>}</>,
+        <>{o.shop?.code ? `${o.shop.code}, ` : ""}{o.shop?.name}{o.whatsapp_link && <><br /><a href={o.whatsapp_link} target="_blank" rel="noreferrer">📲 Alerter par WhatsApp</a></>}</>,
         <>{(o.items as any[]).map((i, k) => <div key={k}>{i.quantity} × {i.title}</div>)}<b>{fcfa(o.subtotal)}</b><br /><small>{o.payment_status === "paid" ? "payé" : "non payé"}{o.payment_method && o.payment_method !== "cod" ? `, ${o.payment_method}${o.payment_ref ? " réf. " + o.payment_ref : ""}` : ""}</small></>,
         <><Badge color={color(o.status)}>{LABEL[o.status]}</Badge>{o.escalated && o.status === "pending" && <div><small>⚠ sans réponse boutique</small></div>}</>,
         <select value={o.courier?.id || ""} onChange={(e) => act(`shop-orders/${o.id}`, { courier_id: e.target.value })}><option value="">Aucun</option>{data.couriers.filter((c: any) => c.active).map((c: any) => <option key={c.id} value={c.id}>{c.name}</option>)}</select>,
@@ -65,7 +60,7 @@ const LxPage = () => {
       ])} />}
 
       {tab === "shops" && <Table head={["Boutique", "Contact", "Statut", ""]} rows={data.shops.map((s: any) => [
-        <>{s.name}<br /><small>{s.address}</small></>, <>{s.phone}<br /><small>{s.email}</small></>, <Badge color={color(s.status)}>{s.status}</Badge>,
+        <><b>{s.code || "sans identifiant"}</b>, {s.name}<br /><small>{s.address}</small></>, <>{s.phone}<br /><small>{s.email}<br />Wave : {s.wave_number || "non renseigné"}<br />Orange Money : {s.om_number || "non renseigné"}</small></>, <Badge color={color(s.status)}>{s.status}</Badge>,
         <div className="flex gap-1">{s.status !== "approved" && <Button size="small" onClick={() => act(`shops/${s.id}`, { status: "approved" })}>Agréer</Button>}{s.status !== "suspended" && <Button size="small" variant="secondary" onClick={() => act(`shops/${s.id}`, { status: "suspended" })}>Suspendre</Button>}</div>,
       ])} />}
 

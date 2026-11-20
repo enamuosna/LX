@@ -11,3 +11,9 @@ app/register-shop
 app/store
 app/track
 app/page.tsx
+app/store
+app/track
+app/account
+app/page.tsx
+# Anciens composants à plat (avant components/ui, components/product…) : ignorés si un ancien dossier a été écrasé.
+components/*.tsx

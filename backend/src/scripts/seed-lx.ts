@@ -55,7 +55,7 @@ export default async function seedLx({ container }: ExecArgs) {
 
   // Boutique démo + compte vendeur
   const svc = lx(container)
-  const shop = await svc.createShops({ name: "Dakar Tech", phone: "221770000001", email: "boutique@lx.sn", address: "Sandaga, Dakar", status: "approved" } as any)
+  const shop = await svc.createShops({ code: "LX-0001", name: "Dakar Tech", phone: "221770000001", email: "boutique@lx.sn", address: "Sandaga, Dakar", status: "approved" } as any)
   const reg = await auth.register("emailpass", { body: { email: "boutique@lx.sn", password: "ChangeMe!2026" } } as any)
   if (reg.authIdentity) await auth.updateAuthIdentities({ id: reg.authIdentity.id, app_metadata: { shop_id: shop.id } })
   await svc.createCouriers({ name: "Moussa Livreur", phone: "221770000002" } as any)
@@ -74,7 +74,7 @@ export default async function seedLx({ container }: ExecArgs) {
     title, handle, status: ProductStatus.PUBLISHED, category_ids: [cat(c)], shipping_profile_id: profile.id,
     description: `${title}, vendu par une boutique agréée. Garantie légale de conformité.`,
     thumbnail: `${front}/img/${img}.png`, images: [{ url: `${front}/img/${img}.png` }],
-    sales_channels: [{ id: channel.id }], metadata: { old_price: old, shop_id: shop.id, shop_name: shop.name },
+    sales_channels: [{ id: channel.id }], metadata: { old_price: old, shop_id: shop.id, shop_code: "LX-0001" },
     options: [{ title: "Défaut", values: ["Standard"] }],
     variants: [{ title: "Standard", sku: handle.toUpperCase(), options: { Défaut: "Standard" }, manage_inventory: true, prices: [{ currency_code: "xof", amount: price }] }],
   })) } })

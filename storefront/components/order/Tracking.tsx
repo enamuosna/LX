@@ -24,11 +24,11 @@ export default function Tracking({ refNo, phone }: { refNo: string; phone: strin
   return (<div className="space-y-5" data-testid="tracking">
     <h2 className="text-xl font-bold">Commande #{d.order_display_id}</h2>
     {d.shop_orders.map((s: any) => (<Card key={s.id}>
-      <CardHeader><div className="font-bold">{s.shop}</div><Badge tone={TONE[s.status] ?? "gray"}>{LABEL[s.status] ?? s.status}</Badge></CardHeader>
+      <CardHeader><div className="font-bold">{s.shop ? `Boutique ${s.shop}` : "Boutique"}</div><Badge tone={TONE[s.status] ?? "gray"}>{LABEL[s.status] ?? s.status}</Badge></CardHeader>
       {s.status in IDX && <Stepper steps={STEPS} current={IDX[s.status]} finished={s.status === "delivered"} />}
       <CardBody className="space-y-3">
         {s.delivery_code && !["delivered", "rejected", "cancelled"].includes(s.status) && <div data-testid="delivery-code" className="flex items-center gap-3 rounded-2xl bg-accent-500/15 p-4"><KeyRound className="size-6 shrink-0 text-yellow-800" /><div><p className="text-sm text-slate-600">Code de livraison : à donner au livreur à la réception</p><p className="font-display text-3xl font-extrabold tracking-[0.3em]">{s.delivery_code}</p></div></div>}
-        {["wave", "orange_money"].includes(s.payment_method) && s.payment_status === "unpaid" && <p className="flex items-center gap-2 text-sm text-slate-600"><Smartphone className="size-4" />Paiement {s.payment_method === "wave" ? "Wave" : "Orange Money"} en attente de confirmation par Lx{s.payment_ref ? ` (réf. ${s.payment_ref})` : ""}.</p>}
+        {["wave", "orange_money"].includes(s.payment_method) && s.payment_status === "unpaid" && <p className="flex items-center gap-2 text-sm text-slate-600"><Smartphone className="size-4" />Paiement {s.payment_method === "wave" ? "Wave" : "Orange Money"} en attente de confirmation par la boutique{s.payment_ref ? ` (réf. ${s.payment_ref})` : ""}.</p>}
         {s.status === "pending" && s.escalated && <Banner tone="warn">Lx a pris le relais auprès de la boutique.</Banner>}
         <p className="text-sm text-slate-600">{s.courier ? <>Livreur : <strong>{s.courier}</strong>. </> : null}Paiement : {s.payment_status === "paid" ? "payé" : "à régler"}</p>
         <ul className="divide-y divide-line text-sm">{s.items.map((i: any, k: number) => <li key={k} className="flex justify-between py-2"><span>{i.quantity} × {i.title}</span><span className="font-semibold">{fcfa(i.unit_price * i.quantity)}</span></li>)}

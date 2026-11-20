@@ -9,7 +9,7 @@ import Shell, { useVendor } from "@/components/vendor/Shell"
 import { fcfa } from "@/lib/medusa"
 import { vendorApi } from "@/lib/vendor"
 
-type Stats = { days: { day: string; sales: number; orders: number }[]; total_sales: number; delivered: number; rejected: number; accept_rate: number | null; top: { title: string; qty: number; revenue: number }[] }
+type Stats = { days: { day: string; sales: number; orders: number }[]; total_sales: number; delivered: number; rejected: number; accept_rate: number | null; margin: number | null; pos_total: number; pos_count: number; top: { title: string; qty: number; revenue: number; margin?: number }[] }
 
 function SalesChart({ days }: { days: Stats["days"] }) {
   const max = Math.max(1, ...days.map((d) => d.sales)), W = 700, H = 220, bw = W / days.length
@@ -27,14 +27,15 @@ function Inner() {
   if (!s) return <div className="space-y-4"><Skeleton className="h-24" /><Skeleton className="h-72" /></div>
   const week = s.days.slice(-7).reduce((t, d) => t + d.sales, 0)
   return (<div className="space-y-6">
-    <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+    <div className="grid grid-cols-2 gap-4 xl:grid-cols-5">
       <StatCard icon={Banknote} tone="green" value={<span className="text-xl"><CountUp value={week} format={fcfa} /></span>} label="Ventes des 7 derniers jours" />
-      <StatCard icon={Banknote} tone="yellow" value={<span className="text-xl"><CountUp value={s.total_sales} format={fcfa} /></span>} label="Ventes livrées au total" />
+      <StatCard icon={Banknote} tone="yellow" value={<span className="text-xl"><CountUp value={s.total_sales} format={fcfa} /></span>} label={s.pos_count ? `Ventes livrées au total, dont ${fcfa(s.pos_total)} en caisse` : "Ventes livrées au total"} />
+      <StatCard icon={Banknote} tone="green" value={s.margin === null ? "n/a" : <span className="text-xl"><CountUp value={s.margin} format={fcfa} /></span>} label={s.margin === null ? "Marge (ajoutez vos prix d'achat)" : "Marge sur les ventes"} />
       <StatCard icon={PackageCheck} tone="blue" value={<CountUp value={s.delivered} />} label="Commandes livrées" />
       <StatCard icon={BadgeCheck} tone="orange" value={s.accept_rate === null ? "n/a" : <CountUp value={s.accept_rate} format={(n) => `${n} %`} />} label="Commandes acceptées" /></div>
     <Card><CardHeader><h2 className="text-lg font-bold">Ventes livrées, 14 derniers jours</h2></CardHeader><CardBody><SalesChart days={s.days} /></CardBody></Card>
     <Card><CardHeader><h2 className="flex items-center gap-2 text-lg font-bold"><Trophy className="size-5 text-accent-500" />Produits les plus vendus</h2></CardHeader>
-      {s.top.length ? <ol className="divide-y divide-line">{s.top.map((t, i) => (<li key={t.title} data-testid="top-product" className="flex items-center gap-4 px-6 py-4"><span className="grid size-8 place-items-center rounded-full bg-surface font-display font-bold">{i + 1}</span><span className="flex-1 font-semibold">{t.title}</span><span className="text-sm text-slate-500">{t.qty} vendu{t.qty > 1 ? "s" : ""}</span><b>{fcfa(t.revenue)}</b></li>))}</ol>
+      {s.top.length ? <ol className="divide-y divide-line">{s.top.map((t, i) => (<li key={t.title} data-testid="top-product" className="flex items-center gap-4 px-6 py-4"><span className="grid size-8 place-items-center rounded-full bg-surface font-display font-bold">{i + 1}</span><span className="flex-1 font-semibold">{t.title}</span><span className="text-sm text-slate-500">{t.qty} vendu{t.qty > 1 ? "s" : ""}</span>{t.margin ? <span className="text-sm text-brand-600">Marge {fcfa(t.margin)}</span> : null}<b>{fcfa(t.revenue)}</b></li>))}</ol>
         : <div className="p-6"><EmptyState icon={Trophy}>Vos meilleurs produits apparaîtront après vos premières livraisons.</EmptyState></div>}</Card>
   </div>)
 }

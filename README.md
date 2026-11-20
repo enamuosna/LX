@@ -89,5 +89,47 @@ Le conteneur tourne en production. En http://localhost le cookie de session est 
 **Paiement et livraison**
 - Zones de livraison avec frais différents (créées par `seed-zones`, modifiables dans l'admin Medusa : Paramètres, Expéditions).
 - Codes promo : `BIENVENUE10` (-10 %) existe par défaut. Les autres se créent dans l'admin Medusa, menu Promotions.
-- Wave et Orange Money : le client envoie le montant au numéro `LX_WAVE_NUMBER` / `LX_OM_NUMBER` puis saisit la référence ; l'équipe Lx la voit dans l'admin (menu Lx) et clique sur « Marquer payé ». Il n'y a pas d'appel à l'API Wave ou Orange Money : cela demande un compte marchand et des clés.
+- Wave et Orange Money : chaque boutique renseigne ses propres numéros (WhatsApp des commandes, Wave, Orange Money) dans Espace boutique > Ma boutique. Au paiement, le client règle chaque boutique sur son numéro et saisit une référence par boutique ; la boutique confirme la réception de son paiement. Les frais de livraison se règlent au livreur Lx. Il n'y a pas d'appel à l'API Wave ou Orange Money (compte marchand et clés nécessaires).
 - Code de livraison à 4 chiffres : affiché au client, demandé au livreur. L'admin Lx ne peut passer une commande à « Livrée » qu'avec ce code.
+
+**Gestion complète de la boutique (Espace boutique)**
+- Inventaire : stock physique, réservé (commandes en cours) et disponible pour chaque produit ; valeur du stock au prix d'achat et au prix de vente ; alertes stock faible (seuil réglable par produit) et rupture.
+- Mouvements : entrée, sortie (perte ou casse, correction), inventaire par comptage (seuls les écarts sont enregistrés). Chaque mouvement est journalisé avec la date, la quantité, le stock après et une note. Un stock négatif est refusé.
+- Cycle de vie : à la commande le stock est réservé ; à la livraison (code client validé) le stock physique baisse et une ligne « Vente livrée » est ajoutée ; un refus ou une annulation libère la réservation.
+- Produits : SKU, catégorie, prix d'achat (visible par la boutique seule), seuil d'alerte, changement de photo, suppression (refusée tant qu'une commande en cours contient le produit).
+- Clients : liste des clients servis, nombre de commandes, montant livré, lien WhatsApp.
+- Statistiques : marge sur les ventes livrées et par produit (si le prix d'achat est renseigné).
+- Exports CSV (commandes, inventaire) et bon de préparation imprimable par commande.
+- Coupure réseau : l'espace boutique affiche un bandeau et réessaie automatiquement, sans déconnecter.
+- Après mise à jour : `npx medusa db:migrate` (table des mouvements de stock).
+
+**Caisse (vente au comptoir)**
+- Espace boutique > Caisse : le client est dans la boutique, le commerçant touche les produits (ou saisit/scanne le SKU puis Entrée), applique une remise et encaisse en espèces (montant reçu et monnaie à rendre), Wave, Orange Money ou carte (terminal de la boutique).
+- Le stock physique baisse tout de suite ; la vente est limitée au stock disponible. Chaque vente a un ticket numéroté (imprimable, format 72 mm, réimprimable).
+- Onglet « Ventes et clôture » : ventes du jour, total par moyen de paiement, espèces attendues en caisse, annulation d'un ticket (le stock est remis en rayon) et clôture de caisse imprimable.
+- Les ventes en caisse apparaissent dans l'inventaire (mouvements « Vente en caisse » / « Vente annulée ») et dans les statistiques (ventes, marge, produits les plus vendus). Aucune livraison Lx n'est déclenchée.
+- Après mise à jour : `npx medusa db:migrate` (table des ventes de caisse).
+
+**Mobile (téléphones et tablettes)**
+- Mise en page testée de 320 px (petits Android) à iPad, en portrait et paysage : aucun défilement horizontal.
+- Espace boutique : barre de navigation en bas de l'écran (Accueil, Caisse, Produits, Inventaire, Plus), panier de caisse en tiroir, inventaire en cartes, fenêtres en feuille qui monte du bas.
+- Champs à 16 px (pas de zoom automatique sur iPhone), zones tactiles d'au moins 40 px, respect de l'encoche et de la barre d'accueil iOS (safe-area), hauteur d'écran dynamique (dvh).
+- Installable sur l'écran d'accueil (Android et iOS) : manifeste, icônes 192/512 px et icône Apple. Raccourcis : Caisse, Suivre une commande.
+
+**Identifiant public des boutiques**
+- Le nom d'une boutique n'est jamais montré aux clients (catalogue, fiche produit, paiement, suivi). Ils voient un identifiant du type `LX-0001`, attribué à l'inscription. La boutique et l'admin voient le nom et l'identifiant.
+- Après mise à jour : `npx medusa db:migrate` puis `npx medusa exec ./src/scripts/backfill-shop-codes.ts` (attribue les identifiants aux boutiques existantes et retire le nom des fiches produit ; lancé automatiquement par le conteneur).
+
+**Espace publicitaire**
+- 4 emplacements : bandeau d'accueil, haut du catalogue, fiche produit, bas du panier. Un emplacement sans publicité n'affiche rien et ne laisse aucun vide.
+- Gestion dans l'admin Medusa, menu « Publicités » (barre latérale) : tableau de bord (en ligne, vues, clics, taux de clic), les 4 emplacements avec leur format conseillé et leur état (libre ou nombre en ligne), filtres par statut et emplacement, création et modification d'une publicité avec envoi du visuel depuis l'ordinateur (JPG, PNG, WebP ou GIF, 3 Mo) ou adresse d'image, aperçu, lien, dates de début et de fin facultatives, priorité (tirage pondéré entre plusieurs publicités), activation, suppression.
+- Suivi par publicité : vues (comptées quand l'encart est réellement visible) et clics, avec le taux de clic. Les annonceurs et compteurs ne sont jamais exposés au public.
+- Chaque encart porte la mention « Publicité » et le lien est en `rel="sponsored"`.
+- Pistes pour plus tard : publicités par catégorie ou par boutique, facturation des annonceurs, rapports par annonceur.
+
+**Mise à jour par-dessus un ancien dossier**
+Dézippez de préférence dans un dossier vide (en gardant votre fichier `.env`). Si le zip a été copié par-dessus une ancienne version, d'anciens fichiers peuvent rester (par exemple `storefront/components/ProductCard.tsx`) : ils sont désormais ignorés par la construction Docker et par la vérification des types, mais vous pouvez les supprimer sans risque.
+
+**Déploiement**
+- Render : `render.yaml` et `RENDER.md` (base, API et vitrine en un clic depuis un dépôt Git).
+- Coolify : `COOLIFY.md`. Local : `docker compose up --build`.

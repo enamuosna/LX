@@ -17,7 +17,7 @@ export function CountUp({ value, format = (n: number) => String(n) }: { value: n
 }
 
 export default function StatCard({ icon: Icon, value, label, tone, highlight }: { icon: LucideIcon; value: React.ReactNode; label: string; tone: keyof typeof tones; highlight?: boolean }) {
-  return (<div className={cn("flex items-center gap-4 rounded-3xl border p-5 transition hover:-translate-y-0.5", highlight ? "border-accent-500 bg-accent-500/10" : "border-line bg-white")}>
-    <div className={cn("grid size-12 shrink-0 place-items-center rounded-2xl", tones[tone])}><Icon className="size-5" /></div>
-    <div className="min-w-0"><div className="font-display text-2xl font-bold leading-tight sm:text-[1.7rem]">{value}</div><div className="text-[13px] text-slate-500">{label}</div></div></div>)
+  return (<div className={cn("flex min-w-0 flex-col items-start gap-3 rounded-3xl border p-4 transition sm:flex-row sm:items-center sm:gap-4 sm:p-5 hover:-translate-y-0.5", highlight ? "border-accent-500 bg-accent-500/10" : "border-line bg-white")}>
+    <div className={cn("grid size-10 shrink-0 place-items-center rounded-2xl sm:size-12", tones[tone])}><Icon className="size-5" /></div>
+    <div className="min-w-0 max-w-full"><div className="font-display text-xl font-bold leading-tight sm:text-[1.7rem]">{value}</div><div className="text-[13px] text-slate-500">{label}</div></div></div>)
 }

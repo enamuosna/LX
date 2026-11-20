@@ -9,7 +9,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
   if (!rows.length) return res.status(404).json({ message: "Commande introuvable." })
   res.json({ order_display_id: ref, shop_orders: rows.map((r: any) => ({
     id: r.id, status: r.status, escalated: r.escalated, payment_status: r.payment_status, items: r.items, subtotal: r.subtotal,
-    shop: r.shop?.name, courier: r.courier?.name ?? null, created_at: r.created_at,
+    shop: r.shop?.code ?? null, courier: r.courier?.name ?? null, created_at: r.created_at,
     delivery_code: r.status === "delivered" ? null : r.delivery_code, payment_method: r.payment_method, payment_ref: r.payment_ref,
   })) })
 }

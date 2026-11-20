@@ -35,6 +35,8 @@ export function CustomerProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string) => {
     const j = await raw("/auth/customer/emailpass", { method: "POST", body: JSON.stringify({ email, password }), headers: {} }).catch(() => { throw new Error("Email ou mot de passe incorrect.") })
     localStorage.setItem(KEY, j.token); await refresh()
+    // Les identifiants d'une boutique passent l'authentification mais n'ont pas de profil client : on l'explique.
+    if (!customerToken()) throw new Error("Ce compte n'est pas un compte client. Les boutiques se connectent dans l'espace boutique, ou créez un compte client avec un autre email.")
   }
   const register = async (d: { email: string; password: string; first_name: string; last_name: string; phone: string }) => {
     const t = await raw("/auth/customer/emailpass/register", { method: "POST", body: JSON.stringify({ email: d.email, password: d.password }), headers: {} }).catch((e) => { throw new Error(/exist/i.test(e.message) ? "Un compte existe déjà avec cet email." : e.message) })

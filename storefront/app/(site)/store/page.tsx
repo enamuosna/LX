@@ -1,3 +1,4 @@
+import AdSlot from "@/components/ads/AdSlot"
 import { PackageSearch } from "lucide-react"
 import Link from "next/link"
 import ProductGrid from "@/components/product/ProductGrid"
@@ -17,6 +18,7 @@ export default async function Store({ searchParams }: { searchParams: Promise<{ 
     <PageHeader title={q ? `Résultats pour « ${q} »` : "Tous les produits"}>{products.length} produit(s) chez nos boutiques agréées</PageHeader>
     <Container className="py-8">
       <div className="mb-6 flex flex-wrap gap-2"><Link href="/store" className={chip(!cat)}>Tout</Link>{cats.map((c) => <Link key={c.id} href={`/store?cat=${c.id}`} className={chip(cat === c.id)}>{c.name}</Link>)}</div>
+      <AdSlot slot="store_top" className="mb-6 !px-0" />
       {products.length ? <ProductGrid products={products} /> : <EmptyState icon={PackageSearch}>Aucun produit trouvé.</EmptyState>}
       <Banner tone="info" className="mt-8"><strong>Produit introuvable ?</strong> Avec <Link className="font-bold underline" href={`/outiko?type=outiko&details=${encodeURIComponent(q || "")}`}>OUTIKO</Link>, l&apos;équipe Lx le recherche pour vous.</Banner>
     </Container></>)

@@ -19,5 +19,6 @@ export default function AuthPanel() {
         <Field label="Téléphone WhatsApp" hint="Pour suivre vos commandes.">{(id) => <Input id={id} name="phone" placeholder="77 000 00 00" required />}</Field></>}
       <Field label="Email">{(id) => <Input id={id} type="email" name="email" required autoComplete="email" />}</Field>
       <Field label="Mot de passe" hint={mode === "register" ? "8 caractères minimum." : undefined}>{(id) => <Input id={id} type="password" name="password" minLength={mode === "register" ? 8 : undefined} required autoComplete={mode === "login" ? "current-password" : "new-password"} />}</Field>
-      <Button full size="lg" loading={busy} data-testid="auth-submit">{mode === "login" ? "Me connecter" : "Créer mon compte"}</Button></form></div>)
+      <Button full size="lg" loading={busy} data-testid="auth-submit">{mode === "login" ? "Me connecter" : "Créer mon compte"}</Button>
+      {mode === "login" && <p className="text-center text-sm text-slate-500">Vous tenez une boutique ? <a href="/vendor/login" className="font-bold text-brand-600">Espace boutique</a></p>}</form></div>)
 }

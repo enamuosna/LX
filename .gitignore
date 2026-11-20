@@ -1,0 +1,9 @@
+node_modules/
+.next/
+.medusa/
+dist/
+.env
+.env.local
+static/
+uploads/
+.DS_Store

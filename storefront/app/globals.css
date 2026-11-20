@@ -45,7 +45,10 @@
 }
 
 @layer base {
-  html { scroll-behavior: smooth; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
+  a, button, [role="button"], input, select, summary, label { touch-action: manipulation; }
+  /* 16 px minimum sur mobile : évite le zoom automatique d'iOS dans les champs */
+  @media (max-width: 767px) { input:not([type="checkbox"]):not([type="radio"]), select, textarea { font-size: 16px; } }
   body { @apply overflow-x-hidden bg-white font-sans text-ink antialiased; }
   h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; text-wrap: balance; }
   p { text-wrap: pretty; }
@@ -57,3 +60,8 @@
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }
+
+/* Encoche, barre d'accueil iOS et barres Android : le contenu reste lisible et cliquable */
+.pb-safe { padding-bottom: max(0.75rem, env(safe-area-inset-bottom)); }
+.pt-safe { padding-top: env(safe-area-inset-top); }
+.min-h-dvh { min-height: 100dvh; }

@@ -10,6 +10,8 @@ export async function POST(req: AuthenticatedMedusaRequest, res: MedusaResponse)
   const svc = lx(req.scope)
   const so = await svc.retrieveShopOrder(req.params.id).catch(() => null)
   if (!so || (so as any).shop_id !== shop.id) return res.status(404).json({ message: "Commande introuvable." })
+  // La boutique encaisse sur son propre Wave / Orange Money : elle confirme elle-même la réception.
+  if ((req.body as any)?.action === "mark_paid") { await svc.updateShopOrders({ id: so.id, payment_status: "paid" } as any); return res.json({ ok: true }) }
   const next = (req.body as any)?.action === "confirm" ? "confirmed" : (req.body as any)?.action === "reject" ? "rejected" : null
   if (!next) return res.status(400).json({ message: "Action invalide." })
   try { await svc.transition(so.id, next) } catch (e: any) { return res.status(409).json({ message: e.message }) }

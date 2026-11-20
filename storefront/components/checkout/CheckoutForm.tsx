@@ -16,16 +16,21 @@ import { fcfa, post, store } from "@/lib/medusa"
 
 const PAY: [string, string][] = [["cod", "Paiement à la livraison"], ["wave", "Wave"], ["orange_money", "Orange Money"], ["card", "Carte bancaire"]]
 type Option = { id: string; name: string; amount: number }
+type CartShop = { id: string; code: string; subtotal: number; wave?: string | null; om?: string | null }
 
-export default function CheckoutForm({ wave: WAVE, om: OM }: { wave: string; om: string }) {
+export default function CheckoutForm() {
   const { cart, reset, reload } = useCart(); const router = useRouter(); const { customer } = useCustomer()
   const [err, setErr] = useState(""), [busy, setBusy] = useState(false), [pay, setPay] = useState("cod")
-  const [options, setOptions] = useState<Option[]>([]), [zone, setZone] = useState(""), [code, setCode] = useState(""), [promoMsg, setPromoMsg] = useState<{ ok: boolean; t: string } | null>(null)
+  const [shops, setShops] = useState<CartShop[]>([]), [options, setOptions] = useState<Option[]>([]), [zone, setZone] = useState(""), [code, setCode] = useState(""), [promoMsg, setPromoMsg] = useState<{ ok: boolean; t: string } | null>(null)
   const items = cart?.items ?? [], addr = customer?.addresses?.[0]
   const cartId = cart?.id
   useEffect(() => { if (!cartId) return; store(`/store/shipping-options?cart_id=${cartId}`).then((d) => { setOptions(d.shipping_options); setZone((z) => z || d.shipping_options[0]?.id || "") }).catch(() => setErr("Impossible de charger les zones de livraison.")) }, [cartId])
+  useEffect(() => { if (cartId) store(`/store/lx/cart-shops?cart_id=${cartId}`).then((d) => setShops(d.shops)).catch(() => {}) }, [cartId, items.length])
   if (!items.length) return <Container className="py-16"><EmptyState icon={ShoppingBag} action={<Button href="/store">Parcourir les produits</Button>}>Votre commande est vide.</EmptyState></Container>
 
+  const methods = PAY.filter(([v]) => v === "cod" || v === "card" || (shops.length > 0 && shops.every((sh) => (v === "wave" ? sh.wave : sh.om))))
+  const mobile = ["wave", "orange_money"].includes(pay) && methods.some(([v]) => v === pay)
+  const due = (sh: CartShop) => Math.round(sh.subtotal - ((cart!.discount_total ?? 0) * sh.subtotal) / (cart!.subtotal || 1))
   const fee = options.find((o) => o.id === zone)?.amount ?? 0, discount = cart!.discount_total ?? 0, total = cart!.subtotal - discount + fee
   async function applyPromo() {
     if (!code.trim()) return; setPromoMsg(null)
@@ -35,11 +40,11 @@ export default function CheckoutForm({ wave: WAVE, om: OM }: { wave: string; om:
     e.preventDefault(); setErr(""); const f = new FormData(e.currentTarget); const g = (k: string) => String(f.get(k) || "").trim()
     const phone = g("phone").replace(/\D/g, "")
     if (phone.length < 9) return setErr("Téléphone invalide.")
-    if (["wave", "orange_money"].includes(pay) && g("payment_ref").length < 4) return setErr("Saisissez la référence de la transaction reçue par SMS.")
+    if (mobile && shops.some((sh) => g(`ref_${sh.id}`).length < 4)) return setErr("Saisissez la référence de chaque paiement, reçue par SMS.")
     setBusy(true)
     try {
       const [first, ...rest] = g("name").split(" ")
-      await post(`/store/carts/${cart!.id}`, { email: customer?.email || g("email") || `${phone}@client.lx.sn`, shipping_address: { first_name: first, last_name: rest.join(" ") || "-", address_1: g("address"), city: g("city") || "Dakar", country_code: "sn", phone }, metadata: { note: g("note"), payment_pref: pay, payment_ref: g("payment_ref") || null } })
+      await post(`/store/carts/${cart!.id}`, { email: customer?.email || g("email") || `${phone}@client.lx.sn`, shipping_address: { first_name: first, last_name: rest.join(" ") || "-", address_1: g("address"), city: g("city") || "Dakar", country_code: "sn", phone }, metadata: { note: g("note"), payment_pref: mobile ? pay : "cod", payment_refs: mobile ? Object.fromEntries(shops.map((sh) => [sh.id, g(`ref_${sh.id}`)])) : null } })
       if (customer) await store(`/store/carts/${cart!.id}/customer`, { method: "POST", body: "{}", headers: customerHeaders() }).catch(() => {})
       if (!zone) throw new Error("Choisissez une zone de livraison.")
       await post(`/store/carts/${cart!.id}/shipping-methods`, { option_id: zone })
@@ -69,11 +74,14 @@ export default function CheckoutForm({ wave: WAVE, om: OM }: { wave: string; om:
             <label key={o.id} data-testid="zone" className={cn("flex cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3 text-sm transition", zone === o.id ? "border-brand-600 bg-brand-50" : "border-line hover:border-slate-300")}>
               <input type="radio" name="zone" value={o.id} checked={zone === o.id} onChange={() => setZone(o.id)} className="accent-brand-600" /><span className="flex-1 font-semibold">{o.name}</span><b>{fcfa(o.amount)}</b></label>))}</div>
           <h2 className="pt-2 text-xl font-bold">Paiement</h2>
-          <div className="grid gap-2 sm:grid-cols-2" role="radiogroup" aria-label="Mode de paiement">{PAY.map(([v, l]) => (
+          <div className="grid gap-2 sm:grid-cols-2" role="radiogroup" aria-label="Mode de paiement">{methods.map(([v, l]) => (
             <label key={v} className={cn("flex cursor-pointer items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-semibold transition", pay === v ? "border-brand-600 bg-brand-50" : "border-line hover:border-slate-300")}>
               <input type="radio" name="payment" value={v} checked={pay === v} onChange={() => setPay(v)} className="accent-brand-600" />{l}</label>))}</div>
-          {["wave", "orange_money"].includes(pay) && <div className="animate-pop-in space-y-3 rounded-2xl bg-accent-500/15 p-4 text-sm"><p>Envoyez le total (<b>{fcfa(total)}</b>) par {pay === "wave" ? "Wave" : "Orange Money"} au <b className="font-display text-lg">{pay === "wave" ? WAVE : OM}</b>, puis saisissez la référence reçue par SMS. Lx confirme votre paiement avant la livraison.</p>
-            <Field label="Référence de la transaction">{(id) => <Input id={id} name="payment_ref" placeholder="ex : MP241115.1234.A56789" required />}</Field></div>}
+          {mobile && <div className="animate-pop-in space-y-4 rounded-2xl bg-accent-500/15 p-4 text-sm">
+            <p>Chaque boutique est payée directement sur son numéro {pay === "wave" ? "Wave" : "Orange Money"}. Après chaque envoi, saisissez la référence reçue par SMS.</p>
+            {shops.map((sh) => (<div key={sh.id} data-testid="shop-pay" className="space-y-2 rounded-xl bg-white p-3"><p>Envoyez <b>{fcfa(due(sh))}</b> à la boutique <b>{sh.code}</b> au <b className="font-display text-lg">{pay === "wave" ? sh.wave : sh.om}</b></p>
+              <Field label={`Référence du paiement à ${sh.code}`}>{(id) => <Input id={id} name={`ref_${sh.id}`} placeholder="ex : MP241115.1234.A56789" required />}</Field></div>))}
+            <p className="text-slate-600">Les frais de livraison ({fcfa(fee)}) se règlent au livreur Lx à la réception.</p></div>}
           {pay === "card" && <p className="text-xs text-slate-500">Le paiement par carte est enregistré, un conseiller Lx vous envoie le lien de paiement.</p>}
           <Button size="lg" full loading={busy} data-testid="confirm-order">{busy ? "Validation…" : `Confirmer et payer ${fcfa(total)}`}</Button></form>
         <aside className="h-fit space-y-4 rounded-[2rem] bg-surface p-7 lg:col-span-2">

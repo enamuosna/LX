@@ -1,5 +1,6 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { Modules } from "@medusajs/framework/utils"
+import { nextShopCode } from "../../../../../lib/shop-code"
 import { lx, norm, validPhone } from "../../../../../lib/lx"
 
 // Inscription d'une boutique : crée l'identité d'authentification (acteur « shop ») + la boutique (statut pending).
@@ -16,7 +17,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
   const reg = await auth.register("emailpass", { url: req.url, headers: req.headers as any, query: {}, protocol: req.protocol, body: { email, password } } as any)
   if (!reg.success || !reg.authIdentity) return res.status(409).json({ message: "Un compte existe déjà avec cet email." })
 
-  const shop = await lx(req.scope).createShops({ name, phone: norm(b.phone), email, address: b.address ? String(b.address).slice(0, 255) : null, status: "pending" } as any)
+  const shop = await lx(req.scope).createShops({ code: await nextShopCode(req.scope), name, phone: norm(b.phone), email, wave_number: b.wave ? norm(b.wave) : null, om_number: b.om ? norm(b.om) : null, address: b.address ? String(b.address).slice(0, 255) : null, status: "pending" } as any)
   await auth.updateAuthIdentities({ id: reg.authIdentity.id, app_metadata: { shop_id: shop.id } })
   res.status(201).json({ shop: { id: shop.id, name: shop.name, status: shop.status } })
 }

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation"
 import ProductReviews from "@/components/product/ProductReviews"
 import FavoriteButton from "@/components/product/FavoriteButton"
 import { Stars } from "@/components/ui/Stars"
+import AdSlot from "@/components/ads/AdSlot"
 import AddToCartForm from "@/components/product/AddToCartForm"
 import StockBadge from "@/components/product/StockBadge"
 import Banner from "@/components/ui/Banner"
@@ -25,9 +26,10 @@ export default async function ProductPage({ params }: { params: Promise<{ handle
       {rating && rating.count > 0 && <a href="#avis" className="flex items-center gap-2 text-sm text-slate-600"><Stars value={rating.avg} size="size-5" />{rating.avg} sur 5 ({rating.count} avis)</a>}
       <Price amount={price(p)} old={p.metadata?.old_price} className="text-3xl" />
       <div className="flex flex-wrap items-center gap-3 text-sm"><StockBadge stock={s} />{s > 0 && <span className="text-slate-500">({s} disponible{s > 1 ? "s" : ""})</span>}
-        {p.metadata?.shop_name && <span className="inline-flex items-center gap-1.5 text-slate-600"><Store className="size-4" />Vendu par <strong>{p.metadata.shop_name}</strong></span>}</div>
+        {p.metadata?.shop_code && <span className="inline-flex items-center gap-1.5 text-slate-600"><Store className="size-4" />Boutique <strong>{p.metadata.shop_code}</strong></span>}</div>
       <p className="whitespace-pre-line text-slate-600">{p.description}</p>
       {s > 0 && p.variants?.[0] && <AddToCartForm variantId={p.variants[0].id} max={s} />}
+      <AdSlot slot="product_side" className="mt-6 !px-0" />
       <Banner tone="warn">Lx n&apos;effectue pas de contrôle qualité : la conformité du produit relève de la boutique agréée.</Banner></div>
   </div><ProductReviews productId={p.id} /></Container>)
 }

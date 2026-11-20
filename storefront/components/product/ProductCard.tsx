@@ -26,6 +26,6 @@ export default function ProductCard({ p, rating }: { p: Product; rating?: { avg:
       <h3 className="line-clamp-2 text-[17px] font-bold leading-snug"><Link href={`/products/${p.handle}`} className="hover:text-brand-600">{p.title}</Link></h3>
       <div className="mt-1 flex items-baseline justify-between gap-2"><Price amount={price(p)} old={p.metadata?.old_price} className="text-lg" /></div>
       {rating && rating.count > 0 && <div className="mt-1 flex items-center gap-1.5 text-xs text-slate-500"><Stars value={rating.avg} size="size-3.5" />{rating.avg} ({rating.count})</div>}
-      <div className="mt-1"><StockBadge stock={s} shop={p.metadata?.shop_name} /></div></div>
+      <div className="mt-1"><StockBadge stock={s} shop={p.metadata?.shop_code} /></div></div>
   </article>)
 }

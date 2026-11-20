@@ -1,4 +1,5 @@
 "use client"
+import AdSlot from "@/components/ads/AdSlot"
 import { ShoppingBag, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { QtyStepper } from "@/components/product/AddToCartForm"
@@ -29,5 +30,5 @@ export default function CartPage() {
           <p className="text-sm text-slate-500">Les frais de livraison dépendent de votre zone, choisie à l&apos;étape suivante.</p>
           <Button href="/checkout" size="lg" full>Valider ma commande</Button>
           <Link href="/store" className="block text-center text-sm font-semibold text-brand-600">Continuer mes achats</Link></aside></div>}
-    </Container></>)
+    <AdSlot slot="cart_bottom" className="mt-10 !px-0" /></Container></>)
 }

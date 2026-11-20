@@ -48,8 +48,6 @@ services:
       MEDUSA_INTERNAL_URL: http://backend:9000
       NEXT_PUBLIC_LX_PHONE: ${LX_PHONE:-+221 77 000 00 00}
       NEXT_PUBLIC_LX_EMAIL: ${LX_EMAIL:-contact@lx.sn}
-      LX_WAVE_NUMBER: ${LX_WAVE_NUMBER:-}
-      LX_OM_NUMBER: ${LX_OM_NUMBER:-}
     ports: [ "3000:3000" ]
 
 volumes:

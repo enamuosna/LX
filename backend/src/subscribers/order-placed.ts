@@ -39,7 +39,7 @@ export default async function orderPlaced({ event: { data }, container }: Subscr
       note: (order.metadata as any)?.note ?? null,
       delivery_code: String(Math.floor(1000 + Math.random() * 9000)),
       payment_method: (order.metadata as any)?.payment_pref ?? "cod",
-      payment_ref: (order.metadata as any)?.payment_ref ?? null,
+      payment_ref: (order.metadata as any)?.payment_refs?.[shopId] ?? (order.metadata as any)?.payment_ref ?? null,
       items,
       subtotal: items.reduce((s, i) => s + i.quantity * i.unit_price, 0),
     } as any)

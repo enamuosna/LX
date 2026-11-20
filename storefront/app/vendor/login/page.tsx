@@ -11,7 +11,7 @@ import { vendorLogin } from "@/lib/vendor"
 
 export default function VendorLogin() {
   const r = useRouter(); const [err, setErr] = useState(""), [busy, setBusy] = useState(false)
-  return (<div className="grid min-h-screen lg:grid-cols-2">
+  return (<div className="grid min-h-dvh lg:grid-cols-2">
     <section className="hidden flex-col justify-center bg-gradient-to-br from-night via-brand-800 to-brand-600 p-14 text-white lg:flex">
       <Logo tone="light" tagline={false} className="[&>span]:text-6xl" /><h1 className="mt-8 text-3xl font-extrabold">Espace boutique</h1>
       <p className="mt-3 max-w-md text-white/80">Recevez les commandes de vos clients, confirmez-les en un clic et laissez Lx s&apos;occuper de la livraison.</p>

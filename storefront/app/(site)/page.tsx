@@ -1,5 +1,6 @@
 import { ArrowRight, ArrowUpRight, Bike, Link2, Search, SearchCheck } from "lucide-react"
 import Link from "next/link"
+import AdSlot from "@/components/ads/AdSlot"
 import HowItWorks from "@/components/home/HowItWorks"
 import LiveOrder from "@/components/home/LiveOrder"
 import ProductGrid from "@/components/product/ProductGrid"
@@ -14,14 +15,14 @@ export default async function Home() {
   const products = await listProducts({ limit: 4 }).catch(() => [])
   return (<>
     <section className="relative overflow-hidden bg-surface">
-      <Container className="grid items-center gap-16 pb-24 pt-14 lg:grid-cols-[1.1fr_0.9fr] lg:pb-32 lg:pt-20">
+      <Container className="grid grid-cols-1 items-center gap-16 pb-24 pt-14 lg:grid-cols-[1.1fr_0.9fr] lg:pb-32 lg:pt-20">
         <div className="min-w-0">
-          <h1 className="animate-rise font-display text-[clamp(3.4rem,9vw,7rem)] font-extrabold leading-[0.9] tracking-tighter" style={rise(0)}>Lo Soxla ?</h1>
+          <h1 className="animate-rise font-display text-[clamp(2.3rem,12vw,7rem)] font-extrabold leading-[0.9] tracking-tighter" style={rise(0)}>Lo Soxla ?</h1>
           <p className="mt-6 max-w-lg animate-rise font-display text-2xl font-semibold leading-snug text-brand-700 sm:text-3xl" style={rise(120)}>Dites ce qu&apos;il vous faut, on vous l&apos;apporte.</p>
           <p className="mt-5 max-w-md animate-rise text-lg leading-relaxed text-slate-600" style={rise(220)}>Des boutiques agréées de Dakar, une alerte WhatsApp pour la boutique, un livreur Lx qui récupère le colis scellé chez elle.</p>
           <form action="/store" role="search" className="mt-8 flex max-w-xl animate-rise items-center rounded-full bg-white p-2 shadow-[0_18px_40px_-20px_rgba(16,35,26,0.35)] ring-2 ring-transparent transition focus-within:ring-brand-600" style={rise(320)}>
             <Search className="ml-4 size-5 shrink-0 text-slate-400" />
-            <input name="q" placeholder="Un téléphone, un casque, un ordinateur…" aria-label="Produit recherché" className="w-0 min-w-0 flex-1 bg-transparent px-3 py-2 text-base outline-none placeholder:text-slate-400" />
+            <input name="q" placeholder="Que cherchez-vous ?" aria-label="Produit recherché" className="w-0 min-w-0 flex-1 bg-transparent px-3 py-2 text-base outline-none placeholder:text-slate-400" />
             <button className="rounded-full bg-brand-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-brand-700 active:scale-95">Chercher</button></form>
           <p className="mt-5 animate-rise text-sm text-slate-500" style={rise(420)}>Introuvable ? <Link href="/outiko?type=outiko" className="font-bold text-brand-600 underline decoration-accent-500 decoration-2 underline-offset-4">Demandez à OUTIKO</Link>, nous le cherchons pour vous.</p></div>
         <div className="animate-rise" style={rise(300)}><LiveOrder /></div>
@@ -44,6 +45,8 @@ export default async function Home() {
           <Bike className="size-9 text-accent-500 transition-transform duration-500 group-hover:translate-x-2" />
           <div className="mt-10"><h3 className="text-3xl font-extrabold">JEULIKO</h3><p className="mt-2 max-w-sm leading-relaxed text-white/75">Vous avez déjà acheté ou réservé chez un vendeur ? Lx passe le récupérer et vous le livre.</p></div></Link>
       </div></Container></section>
+
+    <AdSlot slot="home_banner" className="pb-16" />
 
     <section className="pb-24"><Container>
       <div className="mb-10 flex flex-wrap items-end justify-between gap-4"><h2 className="max-w-xl text-4xl font-extrabold leading-tight sm:text-5xl">En stock chez nos boutiques</h2>

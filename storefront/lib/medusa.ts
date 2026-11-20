@@ -1,7 +1,7 @@
 // Navigateur : on passe par le proxy same-origin /medusa (pas de CORS, la clé publique reste côté serveur).
 // Serveur (SSR) : appel direct au backend (URL interne Docker ou locale).
 const isServer = typeof window === "undefined"
-export const SERVER_URL = process.env.MEDUSA_INTERNAL_URL || process.env.NEXT_PUBLIC_MEDUSA_URL || "http://localhost:9000"
+export const SERVER_URL = process.env.MEDUSA_INTERNAL_URL || (process.env.MEDUSA_HOSTPORT ? `http://${process.env.MEDUSA_HOSTPORT}` : "") || process.env.NEXT_PUBLIC_MEDUSA_URL || "http://localhost:9000"
 export const BASE = isServer ? SERVER_URL : "/medusa"
 
 let pkCache: string | null = null
@@ -38,7 +38,7 @@ export async function getRegionId(): Promise<string> {
 
 export type Product = {
   id: string; title: string; handle: string; description?: string | null; thumbnail?: string | null
-  metadata?: { old_price?: number; shop_name?: string } | null
+  metadata?: { old_price?: number; shop_code?: string } | null
   categories?: { id: string; name: string }[]
   variants?: { id: string; inventory_quantity?: number; calculated_price?: { calculated_amount: number } }[]
 }
